@@ -1,0 +1,3 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/waveform/1080p60/partial_movie_files/TaperedSpiral3D/467829709_3884032339_1559812339.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/waveform/1080p60/partial_movie_files/TaperedSpiral3D/1286222275_2304249630_3146764612.mp4'
