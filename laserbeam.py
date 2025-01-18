@@ -1,128 +1,96 @@
 from manim import *
 import numpy as np
 
-
 class LaserPulse(VGroup):
     def __init__(
         self,
-        start=LEFT*5,
-        end=RIGHT*2,
-        amplitude=0.2,      
-        wave_freq=3.0,       
-        color=GREEN,
-        stroke_width=4,
-        wave_speed=1.0,      
+        start=LEFT * 5,
+        end=RIGHT * 5,
+        amplitude=0.5,
+        sigma=1.0,
+        freq=3.0,
+        wave_speed=2.0,
+        color=BLUE,
+        stroke_width=3,
         **kwargs
     ):
         super().__init__(**kwargs)
+        self.start_point = np.array(start, dtype=float)
+        self.end_point   = np.array(end,   dtype=float)
 
-        self.start = np.array(start)
-        self.end   = np.array(end)
-        self.amplitude    = amplitude
-        self.wave_freq    = wave_freq
-        self.color        = color
+        self.direction   = self.end_point - self.start_point
+        self.length      = np.linalg.norm(self.direction)
+        if self.length == 0:
+            return
+        self.direction /= self.length 
+        self.amplitude  = amplitude
+        self.sigma      = sigma
+        self.freq       = freq
+        self.wave_speed = wave_speed
+        self.color      = color
         self.stroke_width = stroke_width
-        self.wave_speed   = wave_speed
 
-        self.start_alpha = ValueTracker(0.0)
-        self.end_alpha   = ValueTracker(0.0)
+        self.time_tracker = ValueTracker(-3 * self.sigma / self.wave_speed)
+        self.set_opacity(0)
 
-        self.phase_tracker = ValueTracker(0.0)
 
-        self.beam = always_redraw(self._make_beam)
+        self.curve = always_redraw(self._make_pulse_curve)
+        self.add(self.curve)
 
-        self.add(self.beam)
+    def _make_pulse_curve(self):
+        t = self.time_tracker.get_value()
+        center_pos = self.wave_speed * t
 
-    def _make_beam(self) -> ParametricFunction:
-       
-        start_alpha = self.start_alpha.get_value()
-        end_alpha   = self.end_alpha.get_value()
-        phase       = self.phase_tracker.get_value()
 
-        if end_alpha < start_alpha:
-            return ParametricFunction(
-                lambda t: self.start,  
-                t_range=[0, 0],
-            )
+        left_bound  = max(0, center_pos - 3*self.sigma)
+        right_bound = min(self.length, center_pos + 3*self.sigma)
 
-        def param_func(t):
-            line_pos = interpolate(self.start, self.end, t)
-            direction = self.end - self.start
-            dist = np.linalg.norm(direction)
-            if dist == 0:
-                return line_pos
+        if right_bound < left_bound:
+            return ParametricFunction(lambda u: self.start_point, t_range=[0, 0])
 
-            
-            dir_hat = direction / dist
+        def param_func(u):
+            x = interpolate(left_bound, right_bound, u)
+            point_on_line = self.start_point + x * self.direction
 
-            perp = rotate_vector(dir_hat, 90 * DEGREES)
-            distance_along = t * dist
-            wave_argument = (self.wave_freq * distance_along) - (self.wave_speed * phase)
-            
-            
-            offset = self.amplitude * np.sin(wave_argument)
+            envelope = np.exp(-((x - center_pos)**2)/(2 * self.sigma**2))
+            wave_arg = 2 * PI * self.freq * (x - center_pos)
+            oscillation = np.sin(wave_arg)
+            perp = rotate_vector(self.direction, 90 * DEGREES)
 
-            return line_pos + offset * perp
+            offset = self.amplitude * envelope * oscillation
+            return point_on_line + offset * perp
 
         return ParametricFunction(
             param_func,
-            t_range = [start_alpha, end_alpha, 0.01],
-            color = self.color,
-            stroke_width = self.stroke_width,
+            t_range=[0, 1, 0.01],
+            color=self.color,
+            stroke_width=self.stroke_width,
         )
 
+    def animate_pulse(self, run_time=None):
+        self.set_opacity(1)
+        t_start = -3 * self.sigma / self.wave_speed
+        t_end   = (self.length + 3*self.sigma) / self.wave_speed
+        self.time_tracker.set_value(t_start)
+        if run_time is None:
+            run_time = t_end - t_start
 
-    def get_grow_animation(self, run_time=2.0):
-     
-        return self.end_alpha.animate.set_value(1).set_run_time(run_time)
-
-    def get_retract_animation(self, run_time=2.0):
-        return self.start_alpha.animate.set_value(1).set_run_time(run_time)
-
-    def get_phase_animation(self, run_time=4.0, rate=1.0):
-        return self.phase_tracker.animate.increment_value(rate).set_run_time(run_time)
-
-'''example implemenation
-class LaserScene(Scene):
-    def construct(self):
-  
-        gun_outline = VMobject().set_points_as_corners([
-            [-6,  0.2, 0],
-            [-5.2,0.2, 0],
-            [-5,  0,   0],
-            [-5.2,-0.2,0],
-            [-6,  -0.2,0],
-            [-6,  0.2, 0],
-        ])
-        gun_outline.set_stroke(WHITE, 3)
-        gun_label = Text("Laser", font_size=18).move_to([-5.6, 0, 0])
-        self.add(gun_outline, gun_label)
-
+        return self.time_tracker.animate(run_time=run_time).set_value(t_end)
+'''
+example implementation
+        start_point = np.array([-5, 0, 0])
+        end_point   = np.array([ 3, 0, 0])
         pulse = LaserPulse(
-            start = np.array([-5, 0, 0]),
-            end   = np.array([3, 0, 0]),
-            amplitude = 0.2,
-            wave_freq = 3,
-            color = GREEN,
-            stroke_width = 4,
-            wave_speed = 2.0,  
+            start=start_point,
+            end=end_point,
+            amplitude=0.4,
+            sigma=0.4,
+            freq=3.0,
+            wave_speed=1.0,  
+            color=GREEN,
+            stroke_width=3
         )
         self.add(pulse)
-
-        self.play(
-            pulse.get_grow_animation(run_time=2),
-            pulse.get_phase_animation(run_time=2, rate=2)  
-        )
-
-       
-        self.play(
-            pulse.get_phase_animation(run_time=2, rate=4)
-        )
-
-        self.play(
-            pulse.get_retract_animation(run_time=2),
-            pulse.get_phase_animation(run_time=2, rate=2)
-        )
-
+        self.play(pulse.animate_pulse(run_time=8))
         self.wait()
 '''

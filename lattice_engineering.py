@@ -3,6 +3,8 @@ import numpy as np
 import random
 from laserbeam import * # laserbeam.py
 
+# 
+
 class Lattice_Engineering_Animation(Scene):
     def construct(self):
         # Show a bunch of NV center white dots
@@ -156,46 +158,33 @@ class Lattice_Engineering_Animation(Scene):
         
         # Add the open shape to the scene
         self.play(FadeIn(laser_gun),Write(laser_label))
-        
-        start_point = np.array([-5, 0, 0])   
-        end_point = np.array([-2, 0, 0])    
-        
-        pulse_green = LaserPulse(
-            start=start_point,
-            end=end_point,
-            wave_speed=1.0,        
-            amplitude=0.2,          
-            wave_freq=2.0,          
-            color=GREEN,
-            stroke_width=4
-        )
 
+        pulse_green = LaserPulse(
+            start = np.array([-5, 0, 0]),  
+            end = np.array([-2, 0, 0]),   
+            amplitude=.5,
+            sigma=.4,
+            freq=3.0,
+            wave_speed=6.0, 
+            color=GREEN,
+            stroke_width=4,
+        ).set_opacity(0)
         pulse_blue = LaserPulse(
-            start=start_point,
-            end=end_point,
-            wave_speed=1.0,        
-            amplitude=0.2,          
-            wave_freq=2.0,          
+            start = np.array([-5, 0, 0]),  
+            end = np.array([-2, 0, 0]),   
+            amplitude=0.5,
+            sigma=.4,
+            freq=3.0,
+            wave_speed=6.0, 
             color=BLUE,
-            stroke_width=4
-        )
+            stroke_width=4,
+        ).set_opacity(0)
+        
         self.add(pulse_green,pulse_blue)
+
         # Raise normal NV centers to -1, make green
         self.wait(1)
-        self.play(
-            pulse_green.get_grow_animation(run_time=2),
-            pulse_green.get_phase_animation(run_time=2, rate=2)  
-        )
-
-       
-        self.play(
-            pulse_green.get_phase_animation(run_time=2, rate=4)
-        )
-
-        self.play(
-            pulse_green.get_retract_animation(run_time=2),
-            pulse_green.get_phase_animation(run_time=2, rate=2)
-        )
+        self.play(pulse_green.animate_pulse(run_time=1))
         self.play(FadeIn(normal_excite_arrow), run_time=.25)
         # self.play(normal.animate.shift(UP))
         normal_raise = AnimationGroup(normal.animate.shift(UP),normal.animate.set_color(GREEN), normals.animate.set_color(GREEN))
@@ -208,20 +197,7 @@ class Lattice_Engineering_Animation(Scene):
         # Raise dimers to +1, make blue
         self.wait(1)
         self.play(FadeOut(normal_excite_arrow), run_time=.25)
-        self.play(
-            pulse_blue.get_grow_animation(run_time=2),
-            pulse_blue.get_phase_animation(run_time=2, rate=2)  
-        )
-
-       
-        self.play(
-            pulse_blue.get_phase_animation(run_time=2, rate=4)
-        )
-
-        self.play(
-            pulse_blue.get_retract_animation(run_time=2),
-            pulse_green.get_phase_animation(run_time=2, rate=2)
-        )
+        self.play(pulse_blue.animate_pulse(run_time=1))
         # self.play(dimer.animate.shift(2 * UP))
         self.play(FadeIn(dimer_excite_arrow), run_time=.25)
         dimer_raise = AnimationGroup(dimer.animate.set_color(BLUE),dimers.animate.set_color(BLUE))
@@ -234,7 +210,7 @@ class Lattice_Engineering_Animation(Scene):
         # Lower normal NV centers to Ground, make white
         self.wait(1)
         self.play(FadeOut(dimer_excite_arrow), run_time=.25)
-        # self.play(pulse_green.shoot_pulse(run_time=1))
+        self.play(pulse_green.animate_pulse(run_time=1))
         self.play(FadeIn(normal_return_arrow), run_time=.25)
         normal_lower = AnimationGroup(normal.animate.set_color(WHITE),normals.animate.set_color(WHITE))
         self.play(normal_lower)
