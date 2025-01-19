@@ -161,10 +161,18 @@ class DipoleRotation(ThreeDScene):
 
         self.wait(1)
         
-        downward_field = lambda pos: 2 * IN
+        downward_field = lambda pos: IN
         
-        vector_field = ArrowVectorField(downward_field, x_range=[-2,2,0.5], y_range=[-2,2,0.5], color=GREEN).shift(1*OUT)
+        def length_func(length):
+            return 0.45 * sigmoid(length)
+        vector_field = ArrowVectorField(downward_field, x_range=[-2,2,0.5], y_range=[-2,2,0.5], color=GREEN, length_func=length_func).shift(1*OUT)
+        vector_field_2 = ArrowVectorField(downward_field, x_range=[-2,2,0.5], y_range=[-2,2,0.5], color=GREEN, length_func=length_func).shift(1*OUT)
+        def double_length_func(length):
+            return 2 * 0.45 * sigmoid(length)
+        long_vector_field = ArrowVectorField(downward_field, x_range=[-2,2,0.5], y_range=[-2,2,0.5], color=GREEN, length_func=double_length_func).shift(1*OUT)
         [vector.rotate(theta_deg * DEGREES, axis=OUT) for vector in vector_field]
+        [vector.rotate(theta_deg * DEGREES, axis=OUT) for vector in long_vector_field]
+        [vector.rotate(theta_deg * DEGREES, axis=OUT) for vector in vector_field_2]
         
         dot_field = VGroup()
         for x in np.arange(-2, 2.25, 0.5):
@@ -187,7 +195,7 @@ class DipoleRotation(ThreeDScene):
         self.wait(1)
         
         self.play(
-            *[v.animate.set_stroke(width=4) for v in vector_field],B_label_green.animate.set_stroke(width=2))
+            Transform(vector_field, long_vector_field),B_label_green.animate.set_stroke(width=2))
         # [mob.clear_updaters() for mob in magnet]
         # [mob.add_updater(lambda mob, dt: mob.rotate(2 * dt * PI, axis=OUT)) for mob in magnet]
         magnet.clear_updaters()
@@ -195,7 +203,7 @@ class DipoleRotation(ThreeDScene):
         magnet.add_updater(lambda mob, dt: rotate_and_track(mob, dt, rate=1))
         self.wait(1)
         self.play(
-            *[v.animate.set_stroke(width=1) for v in vector_field],B_label_green.animate.set_stroke(width=.5))
+            Transform(vector_field, vector_field_2),B_label_green.animate.set_stroke(width=.5))
         # [mob.clear_updaters() for mob in magnet]
         # [mob.add_updater(lambda mob, dt: mob.rotate(dt * PI, axis=OUT)) for mob in magnet]
         magnet.clear_updaters()
@@ -204,8 +212,6 @@ class DipoleRotation(ThreeDScene):
         
         self.wait(1.25)
         
-        # magnet.clear_updaters()
-        # [mob.clear_updaters() for mob in magnet]
         magnet.clear_updaters()
         self.move_camera(phi=0 * DEGREES, theta=270 * DEGREES, added_anims=[FadeOut(z_label), FadeOut(axes.z_axis), Transform(vector_field, dot_field)])
         
@@ -215,10 +221,9 @@ class DipoleRotation(ThreeDScene):
 
         theta_label = Tex(r"$\theta_1$").move_to([1.4 * np.cos(rotation_tracker.get_value()),1.4 * np.sin(rotation_tracker.get_value()),0]).scale(0.5)
         theta_marker = Line(start=[1 * np.cos(rotation_tracker.get_value()),1 * np.sin(rotation_tracker.get_value()),0], end=[1.2 * np.cos(rotation_tracker.get_value()),1.2 * np.sin(rotation_tracker.get_value()),0])
-        # t_marker = Text("t=", font_size=36).move_to([2.75, 0.25, 0])
-        t_marker = MarkupText(text = f"{precession_clock_tracker.get_value()} s", font_size=36).move_to([2.75, 0, 0])
+        t_marker = MarkupText(text = f"t = {precession_clock_tracker.get_value()}.00 s", font_size=36).move_to([4.25, 0, 0])
         t_marker.add_updater(
-            lambda mob: mob.become(MarkupText(f"t= {precession_clock_tracker.get_value():.2f} s")).move_to([2.75, 0, 0])
+            lambda mob: mob.become(MarkupText(f"t = {precession_clock_tracker.get_value():.2f} s").move_to([4.25, 0, 0]))
         )
         
         def update_time(dt):
@@ -226,13 +231,27 @@ class DipoleRotation(ThreeDScene):
         
         self.play(Write(theta_label), Write(theta_marker), Write(t_marker))
         self.wait(1)
+        magnet.add_updater(lambda mob, dt: rotate_and_track(mob, dt, rate=.25))
+        self.add_updater(update_time)
+        
+        self.wait(1.01)
+
         magnet.clear_updaters()
         self.remove_updater(update_time)
         
-        self.wait(5)
+        theta2_label = Tex(r"$\theta_2$").move_to([1.4 * np.cos(rotation_tracker.get_value()),1.4 * np.sin(rotation_tracker.get_value()),0]).scale(0.5)
+        theta2_marker = Line(start=[1 * np.cos(rotation_tracker.get_value()),1 * np.sin(rotation_tracker.get_value()),0], end=[1.2 * np.cos(rotation_tracker.get_value()),1.2 * np.sin(rotation_tracker.get_value()),0])
+        self.play(Write(theta2_label), Write(theta2_marker))
+        self.wait(1)
         
-        magnet.remove_updater()
-        self.remove_updater(update_time)
+        omega_eq = Tex(r"$\omega = \Delta \theta / \Delta t$").move_to([-4,0.5,0])
+        B_eq = Tex(r"$B = \omega / \gamma$").move_to([-4,-0.5,0])
+        # Tex(r"$B = \omega / \gamma$").move_to([-4,-0.5,0])
+        
+        const_label = Text("constant", font_size=24, color=BLUE).move_to([-3.2,-1.5,0])
+        const_arrow = Vector([0,0.5,0], color=BLUE).move_to([-3.2,-1.1,0])
+        self.play(FadeIn(omega_eq, shift=LEFT), FadeIn(B_eq, shift=LEFT))
+        self.play(Write(const_label), Write(const_arrow), B_eq[0][4].animate.set_color(BLUE), run_time=1)
         
         self.wait(1)
         
@@ -242,7 +261,7 @@ class DipoleRotation(ThreeDScene):
         y = R * np.sin(u) * np.sin(v)
         z = R * np.cos(u)
         return np.array([x, y, z])
-    
+
     def fix_orientations(self, *mob):
         # camera_orientation = self.camera.generate_rotation_matrix()
         # for obj in mob:
