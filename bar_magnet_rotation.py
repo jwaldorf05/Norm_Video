@@ -2,6 +2,8 @@ from manim import *
 import numpy as np
 import random
 import matplotlib as plt
+from magnetic_field import * # magnetic_field.py
+
 
 # Camera Fix from https://gist.github.com/abul4fia/1419b181e8e3410ef78e6acc25c3df94#file-fixed_fixing-py-L13
 
@@ -33,9 +35,9 @@ class DipoleRotation(ThreeDScene):
         
         rotation_tracker = ValueTracker(0) # For tracking how far the magnet has spun
         
-        def rotate_and_track(mob, dt, rate):
+        def rotate_and_track(mob, dt):
             """Rotates the Mobject about the z hat direction, at 'rate' rotations per second"""
-            angle_increment = dt * rate * 2 * PI  # Rotation increment per frame
+            angle_increment = dt * magnet_spin_rate.get_value() * 2 * PI  # Rotation increment per frame
             mob.rotate(angle_increment, axis=OUT)
             rotation_tracker.increment_value(angle_increment)
         
@@ -67,7 +69,7 @@ class DipoleRotation(ThreeDScene):
             start=ORIGIN,
             end=1.5*spin_direction,
             color=RED,
-            resolution=(2,16)
+            # resolution=(2,16)
         )
 
         self.add(sphere_mesh)
@@ -81,7 +83,7 @@ class DipoleRotation(ThreeDScene):
         south_label = Text("S", color=WHITE).scale(0.5).move_to([-0.6,0,0])
         B_label_green = Tex(r'$\vec{B}$',color=GREEN).move_to([2.5,2.5,2.5])
         B_label_blue = Tex(r'$\vec{B}$',color=BLUE).move_to([2.5,2.5,2.5])
-        self.fix_orientations(north_label,south_label)
+        # self.fix_orientations(north_label,south_label)
         self.fix_in_frame(B_label_blue, B_label_green)
         
         self.set_camera_orientation(phi=phi_deg * DEGREES,theta=theta_deg * DEGREES)
@@ -93,44 +95,55 @@ class DipoleRotation(ThreeDScene):
         
         # Create Magnetic Field
         
-        
         # Define the dipole orientation (any arbitrary direction)
         dipole_direction = spin_direction  # Example: A diagonal vector
         dipole_direction = dipole_direction / np.linalg.norm(dipole_direction)  # Normalize
         
-        def magnetic_field(pos):
-            x, y, z = pos
-            r = np.sqrt(x**2 + y**2 + z**2) + 1e-8  # Avoid division by zero
-            m = 1  # Magnetic dipole moment
-            mu_0 = 1  # Magnetic constant (scaled for visualization)
-
-            # Project the position vector onto the dipole direction
-            pos_vector = np.array([x, y, z])
-            projection = np.dot(pos_vector, dipole_direction) * dipole_direction  # Parallel component
-            perpendicular = pos_vector - projection  # Perpendicular component
-
-            # Compute the magnetic field
-            B = (
-                mu_0 * m / (4 * np.pi * r**5) *
-                (3 * np.dot(pos_vector, dipole_direction) * dipole_direction - pos_vector)
-            )
-            
-            return B
         
-        # stream_lines = StreamLines(
-        #     magnetic_field,
-        #     x_range=[-3, 3],
-        #     y_range=[-3, 3],
-        #     z_range=[-3, 3],
-        #     stroke_width=2,
-        #     padding=3,
-        #     color=BLUE,
-        #     max_anchors_per_line=50,
-        # )
-        # self.play(stream_lines.create())
-        self.play(FadeIn(B_label_blue))
+        dipole_moment = np.array([1, 0, 0], dtype=float)
+        dipole_center = np.array([0, 0, 0], dtype=float)
+        scale_factor  = 0.05  
+        
+        seed_points = []
+        x_top = 1.1
+        # for radius in [0.1]:  
+        radius = 1
+        for angle_deg in [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
+        # for angle_deg in [0, 90, 180, 270]:
+            angle = angle_deg * DEGREES
+            y = radius * np.cos(angle)
+            z = radius * np.sin(angle)
+            seed_points.append(np.array([x_top, y, z]))
+
+        field_lines = []
+        for seed in seed_points:
+            plus_trace = trace_field_line(
+                start_point=seed,
+                field_func=lambda p: dipole_field(
+                    p, dipole_moment, dipole_center, scale_factor
+                ),
+                step_size=0.03,
+                n_steps=12000,
+                direction=+1
+            )
+            minus_trace = trace_field_line(
+                start_point=seed,
+                field_func=lambda p: dipole_field(
+                    p, dipole_moment, dipole_center, scale_factor
+                ),
+                step_size=0.03,
+                n_steps=12000,
+                direction=-1
+            )
+
+            plus_line  = create_field_line_from_points(plus_trace,  color=BLUE, width=2)
+            minus_line = create_field_line_from_points(minus_trace, color=BLUE, width=2)
+            field_lines.extend([plus_line, minus_line])
+        
+        
+        self.play(FadeIn(B_label_blue), FadeIn(*field_lines))
         self.wait(0.5)
-        self.play(FadeOut(B_label_blue))
+        self.play(FadeOut(B_label_blue), FadeOut(*field_lines))
         
         # Create the bar magnet
         magnet_length = 1.6
@@ -163,6 +176,8 @@ class DipoleRotation(ThreeDScene):
         
         downward_field = lambda pos: IN
         
+        magnet_spin_rate = ValueTracker(1)
+        
         def length_func(length):
             return 0.45 * sigmoid(length)
         vector_field = ArrowVectorField(downward_field, x_range=[-2,2,0.5], y_range=[-2,2,0.5], color=GREEN, length_func=length_func).shift(1*OUT)
@@ -189,36 +204,31 @@ class DipoleRotation(ThreeDScene):
         self.play(Create(vector_field),FadeIn(B_label_green))
         
         # Rotate the prism about its z-axis (or any axis you choose)
-        # magnet.add_updater(lambda mob, dt: mob.rotate(dt * PI, axis=OUT))
-        magnet.add_updater(lambda mob, dt: rotate_and_track(mob, dt, rate=.5))
+        magnet_spin_rate.set_value(0.5)
+        magnet.add_updater(lambda mob, dt: rotate_and_track(mob, dt))
         
         self.wait(1)
         
         self.play(
-            Transform(vector_field, long_vector_field),B_label_green.animate.set_stroke(width=2))
-        # [mob.clear_updaters() for mob in magnet]
-        # [mob.add_updater(lambda mob, dt: mob.rotate(2 * dt * PI, axis=OUT)) for mob in magnet]
-        magnet.clear_updaters()
-        # magnet.add_updater(lambda mob, dt: mob.rotate(2 * dt * PI, axis=OUT))
-        magnet.add_updater(lambda mob, dt: rotate_and_track(mob, dt, rate=1))
+            Transform(vector_field, long_vector_field),B_label_green.animate.set_stroke(width=2), magnet_spin_rate.animate.set_value(1))
+        
         self.wait(1)
         self.play(
-            Transform(vector_field, vector_field_2),B_label_green.animate.set_stroke(width=.5))
-        # [mob.clear_updaters() for mob in magnet]
-        # [mob.add_updater(lambda mob, dt: mob.rotate(dt * PI, axis=OUT)) for mob in magnet]
-        magnet.clear_updaters()
-        # magnet.add_updater(lambda mob, dt: mob.rotate(dt * PI, axis=OUT))
-        magnet.add_updater(lambda mob, dt: rotate_and_track(mob, dt, rate=.5))
+            Transform(vector_field, vector_field_2),B_label_green.animate.set_stroke(width=.5), magnet_spin_rate.animate.set_value(0.5))
+
+        # magnet.clear_updaters()
+        # magnet.add_updater(lambda mob, dt: rotate_and_track(mob, dt, rate=.5))
+        
         
         self.wait(1.25)
         
-        magnet.clear_updaters()
+        magnet_spin_rate.set_value(0)
         self.move_camera(phi=0 * DEGREES, theta=270 * DEGREES, added_anims=[FadeOut(z_label), FadeOut(axes.z_axis), Transform(vector_field, dot_field)])
         
         self.wait(1)
         
         precession_clock_tracker = ValueTracker(0) # For tracking how far the magnet has spun
-
+        
         theta_label = Tex(r"$\theta_1$").move_to([1.4 * np.cos(rotation_tracker.get_value()),1.4 * np.sin(rotation_tracker.get_value()),0]).scale(0.5)
         theta_marker = Line(start=[1 * np.cos(rotation_tracker.get_value()),1 * np.sin(rotation_tracker.get_value()),0], end=[1.2 * np.cos(rotation_tracker.get_value()),1.2 * np.sin(rotation_tracker.get_value()),0])
         t_marker = MarkupText(text = f"t = {precession_clock_tracker.get_value()}.00 s", font_size=36).move_to([4.25, 0, 0])
@@ -229,9 +239,28 @@ class DipoleRotation(ThreeDScene):
         def update_time(dt):
             precession_clock_tracker.increment_value(dt)
         
-        self.play(Write(theta_label), Write(theta_marker), Write(t_marker))
+        inside_dots = VGroup()
+        outside_dots = VGroup()
+        for x in np.arange(-2, 2.25, 0.5):
+            for y in np.arange(-2, 2.25, 0.5):
+                pos = np.array([x, y, 1])
+                dot = Dot(
+                    point=pos,
+                    color=GREEN,
+                    radius=0.05
+                )
+                if np.linalg.norm([x,y,0]) <= 1.1:
+                    inside_dots.add(dot)
+                else:
+                    outside_dots.add(dot)
+                
+        self.remove(vector_field)
+        self.add(inside_dots, outside_dots)
+        
+        self.play(Write(theta_label), Write(theta_marker), Write(t_marker), inside_dots.animate.set_opacity(0.5))
         self.wait(1)
-        magnet.add_updater(lambda mob, dt: rotate_and_track(mob, dt, rate=.25))
+
+        magnet_spin_rate.set_value(0.25)
         self.add_updater(update_time)
         
         self.wait(1.01)
@@ -246,7 +275,6 @@ class DipoleRotation(ThreeDScene):
         
         omega_eq = Tex(r"$\omega = \Delta \theta / \Delta t$").move_to([-4,0.5,0])
         B_eq = Tex(r"$B = \omega / \gamma$").move_to([-4,-0.5,0])
-        # Tex(r"$B = \omega / \gamma$").move_to([-4,-0.5,0])
         
         const_label = Text("constant", font_size=24, color=BLUE).move_to([-3.2,-1.5,0])
         const_arrow = Vector([0,0.5,0], color=BLUE).move_to([-3.2,-1.1,0])
@@ -254,6 +282,8 @@ class DipoleRotation(ThreeDScene):
         self.play(Write(const_label), Write(const_arrow), B_eq[0][4].animate.set_color(BLUE), run_time=1)
         
         self.wait(1)
+        
+        self.play(FadeOut(*self.mobjects),FadeOut(t_marker))
         
         
     def sphere_param(self, u, v, R):
@@ -272,4 +302,3 @@ class DipoleRotation(ThreeDScene):
     def fix_in_frame(self, *mob):
         self.add_fixed_in_frame_mobjects(*mob)
         self.remove(*mob)
-    
