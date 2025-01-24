@@ -1,5 +1,6 @@
 from manim import * 
 import numpy as np
+from waveform import * 
 
 # manim -pqh Trinity_classical_limit.py ClassicalLimitAnimation
 class ClassicalLimitAnimation(ThreeDScene):
@@ -10,8 +11,8 @@ class ClassicalLimitAnimation(ThreeDScene):
         axis_y = ValueTracker(0.0)
         axis_z = ValueTracker(0.0)
         vector_spin_rate = ValueTracker(1.0)
-        sphere_shake_rate = ValueTracker(10)
-        sphere_shake_amplitude = ValueTracker(1.0)
+        sphere_shake_rate = ValueTracker(20)
+        sphere_shake_amplitude = ValueTracker(0.5)
         
         def rotate_spin_vector(mob, dt):
             """Rotates the Mobject about the 'rotation_axis', at 'rate' rotations per second"""
@@ -79,7 +80,8 @@ class ClassicalLimitAnimation(ThreeDScene):
         # )
         # wave_3d.set_style(fill_opacity=0.6, stroke_opacity=0.2).set_color(BLUE_E)
         
-        wave_line_3d = self.create_2d_wave_function(x_min=-4, x_max = 4).rotate(PI/2, axis=[0,1,0], about_point=ORIGIN).rotate(PI/2, axis=[1,0,0], about_point=ORIGIN)
+        # wave_line_3d = self.create_2d_wave_function(x_min=-4, x_max = 4).rotate(PI/2, axis=[0,1,0], about_point=ORIGIN).rotate(PI/2, axis=[1,0,0], about_point=ORIGIN)
+        wave_line_3d = WaveFunc3d(orientation=(0 * DEGREES, 0 * DEGREES), show_axes=False)
         wave_line_spin = Arrow3D(
             start=ORIGIN,
             end=np.array([0,1,0]),
@@ -88,7 +90,7 @@ class ClassicalLimitAnimation(ThreeDScene):
 
         self.play(
             FadeOut(arrow_3d),
-            ReplacementTransform(sphere_mesh, wave_line_3d),
+            # ReplacementTransform(sphere_mesh, wave_line_3d),
             run_time=1
         )
         self.wait(1)

@@ -1,7 +1,7 @@
 from manim import *
 import numpy as np
 
-class TaperedSpiral(VGroup):
+class WaveFunc3d(VGroup):
     def __init__(
         self,
         orientation=(0, 0, 0),  
