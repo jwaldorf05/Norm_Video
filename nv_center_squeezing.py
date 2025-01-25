@@ -2,7 +2,7 @@ from manim import *
 import numpy as np
 import random
 import matplotlib as plt
-# from waveform import * # waveform.py
+from waveform import * # waveform.py
 from carbon_lattice import * # carbon_lattice.py
 # from manim.opengl import *
 # config.renderer="opengl"
@@ -18,7 +18,7 @@ class NVCenter(ThreeDScene):
         diamond_shape = VMobject()
         diamond_shape.set_points_as_corners([[-2,2,0], [2,2,0], [4, 0, 0], [0, -4, 0], [-4, 0, 0], [-2,2,0],]).set_stroke(color=WHITE, width=12).move_to([0,-.5,0])
         self.add(diamond_shape)
-        self.set_camera_orientation(distance = 1000)
+        self.set_camera_orientation(phi=0 * DEGREES,theta=-90*DEGREES, distance = 1000)
         
         
         
@@ -33,14 +33,14 @@ class NVCenter(ThreeDScene):
         
         # Base objects
         base_sphere = Sphere(radius=a * 0.1,resolution=8, color=BLACK).move_to(a*np.array([0,0,0])).set_fill(color=BLACK, opacity=1)
-        base_sphere.z_index = 2
+        # base_sphere.z_index = 2
         base_bonds = VGroup(
-            Line([0 + (a * 0.1 /np.sqrt(3)),0 + (a * 0.1 /np.sqrt(3)),0 + (a * 0.1 /np.sqrt(3))],a*np.array([0.25 - ( 0.1 /np.sqrt(3)),0.25 - ( 0.1 /np.sqrt(3)),0.25 - ( 0.1 /np.sqrt(3))])),
-            Line(a*np.array([0.25 + ( 0.1 /np.sqrt(3)),0.25 - ( 0.1 /np.sqrt(3)),0.25 + ( 0.1 /np.sqrt(3))]),a*np.array([0.5 - ( 0.1 /np.sqrt(3)), 0 + ( 0.1 /np.sqrt(3)), 0.5 - ( 0.1 /np.sqrt(3))])),
-            Line(a*np.array([0.25 - ( 0.1 /np.sqrt(3)),0.25 + ( 0.1 /np.sqrt(3)),0.25 + ( 0.1 /np.sqrt(3))]),a*np.array([0 + ( 0.1 /np.sqrt(3)), 0.5 - ( 0.1 /np.sqrt(3)), 0.5 - ( 0.1 /np.sqrt(3))])),
-            Line(a*np.array([0.25 + ( 0.1 /np.sqrt(3)),0.25 + ( 0.1 /np.sqrt(3)),0.25 - ( 0.1 /np.sqrt(3))]),a*np.array([0.5 - ( 0.1 /np.sqrt(3)), 0.5 - ( 0.1 /np.sqrt(3)), 0 + ( 0.1 /np.sqrt(3))])),
+            Line([0 + (a * 0.1 /np.sqrt(2)),0 + (a * 0.1 /np.sqrt(2)),0 + (a * 0.1 /np.sqrt(2))],a*np.array([0.25 - ( 0.1 /np.sqrt(2)),0.25 - ( 0.1 /np.sqrt(2)),0.25 - ( 0.1 /np.sqrt(2))])),
+            Line(a*np.array([0.25 + ( 0.1 /np.sqrt(2)),0.25 - ( 0.1 /np.sqrt(2)),0.25 + ( 0.1 /np.sqrt(2))]),a*np.array([0.5 - ( 0.1 /np.sqrt(2)), 0 + ( 0.1 /np.sqrt(2)), 0.5 - ( 0.1 /np.sqrt(2))])),
+            Line(a*np.array([0.25 - ( 0.1 /np.sqrt(2)),0.25 + ( 0.1 /np.sqrt(2)),0.25 + ( 0.1 /np.sqrt(2))]),a*np.array([0 + ( 0.1 /np.sqrt(2)), 0.5 - ( 0.1 /np.sqrt(2)), 0.5 - ( 0.1 /np.sqrt(2))])),
+            Line(a*np.array([0.25 + ( 0.1 /np.sqrt(2)),0.25 + ( 0.1 /np.sqrt(2)),0.25 - ( 0.1 /np.sqrt(2))]),a*np.array([0.5 - ( 0.1 /np.sqrt(2)), 0.5 - ( 0.1 /np.sqrt(2)), 0 + ( 0.1 /np.sqrt(2))])),
         )
-        base_bonds.z_index = 1
+        # base_bonds.z_index = 1
         for x in lattice_xrange:
             for y in lattice_yrange:
                 for z in lattice_zrange:
@@ -62,9 +62,9 @@ class NVCenter(ThreeDScene):
                     )
                                 
         diamond_lattice.scale(0.5).move_to([0,0,0])
-        diamond_lattice.z_index = 2
+        # diamond_lattice.z_index = 2
         lattice_bonds.scale(0.5).move_to([0,0,0])
-        lattice_bonds.z_index = 2
+        # lattice_bonds.z_index = 2
         # diamond_lattice.set_opacity(min(1, max(0, 1 - dist / lens_border.radius)))
         self.add(lattice_bonds, diamond_lattice)
         
@@ -89,18 +89,18 @@ class NVCenter(ThreeDScene):
         # Replace C with N, add vacancy
         replacement_location = np.array([0.75,-0.75,0])
         
-        nitrogen = Sphere(radius=a * 0.1,resolution=8, color=BLUE, stroke_opacity=0).move_to(replacement_location).set_fill(color=BLUE, opacity=1)
-        nitrogen.z_index = 2
-        error_tolerance = 0.01
+        # nitrogen = Sphere(radius=a * 0.1,resolution=8, color=BLUE, stroke_opacity=0).move_to(replacement_location).set_fill(color=BLUE, opacity=1)
+        # nitrogen.z_index = 2
+        error_tolerance = 0.05
         
         for carbon in diamond_lattice:
             print(carbon.get_center().tolist())
             if (all(abs(a - b) <= error_tolerance for a, b in zip(np.array(carbon.get_center().tolist()), replacement_location))):
-                a1 = Transform(carbon, nitrogen)
+                a1 = carbon.animate.set_style(fill_color=BLUE, stroke_opacity=0).set_z_index(1)
                 
         for bond_group in lattice_bonds:
             for bond in bond_group:
-                # print(bond.get_center().tolist())
+                print(bond.get_center().tolist())
                 if all(abs(a - b) <= error_tolerance for a, b in zip(bond.get_center().tolist(), replacement_location + np.array([-0.375, 0.375, 0.375]))):
                     a2 = FadeOut(bond)
         
@@ -114,7 +114,7 @@ class NVCenter(ThreeDScene):
         e1 = Sphere(radius=a * 0.025,resolution=8, color=BLUE, stroke_opacity=0).move_to(e1_pos).set_fill(color=BLUE, opacity=0.5)
         e2 = Sphere(radius=a * 0.025,resolution=8, color=BLUE, stroke_opacity=0).move_to(e2_pos).set_fill(color=BLUE, opacity=0.5)
         electron_pair = VGroup(e1, e2)
-        electron_pair.z_index = 2
+        # electron_pair.z_index = 2
         self.play(FadeIn(electron_pair))
         
         # Create Vacancy
@@ -151,9 +151,9 @@ class NVCenter(ThreeDScene):
             start=vacancy_location,
             end=vacancy_location + 0.2 * (spin_loc - vacancy_location),
             color=RED,
-            thickness=0.015,
-            height=0.06,
-            base_radius=0.03,
+            thickness=0.005,
+            height=0.02,
+            base_radius=0.01,
         )
 
         # spin_arrow.rotate(x_angle * DEGREES, axis=RIGHT, about_point=[0,0,1.5])
