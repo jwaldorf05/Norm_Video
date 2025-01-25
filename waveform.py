@@ -1,6 +1,8 @@
 from manim import *
 import numpy as np
 
+# Class test code
+# manim -pqh waveform.py My3DScene
 class WaveFunc3d(VGroup):
     def __init__(
         self,
@@ -16,6 +18,7 @@ class WaveFunc3d(VGroup):
         formula=None, 
         color=BLUE,    
         particle_color=RED,
+        particle_opacity=1,
         **kwargs
     ):
       
@@ -32,6 +35,7 @@ class WaveFunc3d(VGroup):
         self.x_span = x_span
         self.color = color
         self.particle_color = particle_color
+        self.particle_opacity = particle_opacity
 
         def default_wave_packet(t):
             '''Returns a set of coordinates np.array([x,y,z]) for some given
@@ -53,7 +57,7 @@ class WaveFunc3d(VGroup):
             color=self.color,
         )
 
-        self.particle = Sphere(radius=0.05, color=self.particle_color)
+        self.particle = Sphere(radius=0.05, color=self.particle_color).set_opacity(self.particle_opacity)
         self.particle.move_to(self.wave_packet_func(-1))
 
         def spiral_updater(mob):
@@ -63,8 +67,8 @@ class WaveFunc3d(VGroup):
                 t_range=[-1, current_t],
                 color=self.color
             )
-            mob.become(new_spiral)
-
+            mob.become(new_spiral).rotate(x_angle * DEGREES, axis=RIGHT, about_point=ORIGIN).rotate(y_angle * DEGREES, axis=UP, about_point=ORIGIN).rotate(z_angle * DEGREES, axis=OUT, about_point=ORIGIN)
+        
         self.spiral.add_updater(spiral_updater)
 
         def particle_updater(mob):
@@ -89,13 +93,30 @@ class WaveFunc3d(VGroup):
         self.rotate(x_angle * DEGREES, axis=RIGHT, about_point=ORIGIN)
         self.rotate(y_angle * DEGREES, axis=UP, about_point=ORIGIN)
         self.rotate(z_angle * DEGREES, axis=OUT, about_point=ORIGIN)
+    
+        # def rotate_spiral(dt, rate, axis, spin_center):
+        #     self.spiral.rotate(dt * 2 * PI * rate, axis=axis, about_point=spin_center)
 
     def get_spiral_animation(self, run_time=None, rate_func=smooth):
         '''Makes the wave equation rotate for run_time seconds.  '''
         if run_time is None:
             run_time = 5.0 / self.speed
         return self.t_tracker.animate.set_value(1).set_run_time(run_time).set_rate_func(rate_func)
+        
+
     
+    
+    def precess_spiral(self, axis, rate, spin_center=ORIGIN):
+        '''Makes the waveform '''
+        self.spin_rate = rate
+        self.spin_axis = axis
+        self.spin_center = spin_center
+        self.spiral.add_updater(lambda mob, dt: mob.rotate(dt * 2 * PI * self.spin_rate, axis=self.spin_axis, about_point=ORIGIN))
+        
+        
+    def stop_precession(self):
+        self.spiral.remove_updater(lambda mob, dt: mob.rotate(dt * 2 * PI * self.spin_rate, axis=self.spin_axis, about_point=self.spin_center))
+
 
 # example implementation 
 class My3DScene(ThreeDScene):
@@ -116,4 +137,5 @@ class My3DScene(ThreeDScene):
         self.add(spiral_mobject)
         self.set_camera_orientation(phi=70 * DEGREES, theta=35 * DEGREES, distance=6)
         self.play(spiral_mobject.get_spiral_animation(run_time=3))  
-        self.wait()
+        spiral_mobject.add_updater(lambda mob, dt: mob.rotate(dt * 2 * PI, axis=UP))
+        self.wait(5)
