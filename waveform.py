@@ -34,6 +34,8 @@ class WaveFunc3d(VGroup):
         self.particle_color = particle_color
 
         def default_wave_packet(t):
+            '''Returns a set of coordinates np.array([x,y,z]) for some given
+            parametric value t for the default wave function.'''
             x_val = t * self.x_span
             radius = self.r_max * np.exp(-(t**2) / (self.sigma**2))
             angle = 2 * np.pi * self.turns * self.frequency * t
@@ -89,6 +91,29 @@ class WaveFunc3d(VGroup):
         self.rotate(z_angle * DEGREES, axis=OUT, about_point=ORIGIN)
 
     def get_spiral_animation(self, run_time=None, rate_func=smooth):
+        '''Makes the wave equation rotate for run_time seconds.  '''
         if run_time is None:
             run_time = 5.0 / self.speed
         return self.t_tracker.animate.set_value(1).set_run_time(run_time).set_rate_func(rate_func)
+    
+
+# example implementation 
+class My3DScene(ThreeDScene):
+    def construct(self):
+        spiral_mobject = WaveFunc3d(
+            orientation=(75, 30, 0),
+            position=ORIGIN,
+            show_axes=True,
+            speed=2.0,
+            frequency=1.5,
+            turns=5,
+            r_max=0.5,
+            sigma=0.4,
+            x_span=1.5,
+            color=BLUE,
+            particle_color=RED,
+        )
+        self.add(spiral_mobject)
+        self.set_camera_orientation(phi=70 * DEGREES, theta=35 * DEGREES, distance=6)
+        self.play(spiral_mobject.get_spiral_animation(run_time=3))  
+        self.wait()

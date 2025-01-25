@@ -9,6 +9,8 @@ from test1 import * # magnetic_field.py
 
 # manim -pqh bar_magnet_rotation.py DipoleRotation --disable_caching
 
+# For final cut: manim -pqh --fps 120 --resolution 1920,1080 bar_magnet_rotation.py DipoleRotation --disable_caching
+
 class MyCamera(ThreeDCamera):
     def transform_points_pre_display(self, mobject, points):
         if getattr(mobject, "fixed", False):
@@ -65,7 +67,8 @@ class DipoleRotation(ThreeDScene):
         
         spin_direction = np.array([1,0,0])
         
-        spin_arrow = Arrow3D(
+        spin_arrow = Arrow3D(start=ORIGIN, end=ORIGIN, color=RED)
+        Arrow3D(
             start=ORIGIN,
             end=1.5*spin_direction,
             color=RED,
@@ -91,54 +94,8 @@ class DipoleRotation(ThreeDScene):
         self.play(FadeOut(particle_label))
         self.play(Write(axes), Write(x_label), Write(y_label), Write(z_label))
         self.wait(1)
-        self.play(Create(spin_arrow))
+        self.play(Write(spin_arrow))
         
-        # Create Magnetic Field
-        
-        # # Define the dipole orientation (any arbitrary direction)
-        # dipole_direction = spin_direction  # Example: A diagonal vector
-        # dipole_direction = dipole_direction / np.linalg.norm(dipole_direction)  # Normalize
-        
-        
-        # dipole_moment = np.array([1, 0, 0], dtype=float)
-        # dipole_center = np.array([0, 0, 0], dtype=float)
-        # scale_factor  = 0.05  
-        
-        # seed_points = []
-        # x_top = 1.1
-        # # for radius in [0.1]:  
-        # radius = 1
-        # for angle_deg in [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
-        # # for angle_deg in [0, 90, 180, 270]:
-        #     angle = angle_deg * DEGREES
-        #     y = radius * np.cos(angle)
-        #     z = radius * np.sin(angle)
-        #     seed_points.append(np.array([x_top, y, z]))
-
-        # field_lines = []
-        # for seed in seed_points:
-        #     plus_trace = trace_field_line(
-        #         start_point=seed,
-        #         field_func=lambda p: dipole_field(
-        #             p, dipole_moment, dipole_center, scale_factor
-        #         ),
-        #         step_size=0.03,
-        #         n_steps=12000,
-        #         direction=+1
-        #     )
-        #     minus_trace = trace_field_line(
-        #         start_point=seed,
-        #         field_func=lambda p: dipole_field(
-        #             p, dipole_moment, dipole_center, scale_factor
-        #         ),
-        #         step_size=0.03,
-        #         n_steps=12000,
-        #         direction=-1
-        #     )
-
-        #     plus_line  = create_field_line_from_points(plus_trace,  color=BLUE, width=2)
-        #     minus_line = create_field_line_from_points(minus_trace, color=BLUE, width=2)
-        #     field_lines.extend([plus_line, minus_line])
         curve_group = MyCurves(
             t_min=0,
             t_max=PI,

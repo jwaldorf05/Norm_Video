@@ -141,8 +141,39 @@ class NVCenter(ThreeDScene):
         # Move electron pair into hole, and make it into a spinning wave equation
         # wave_eq = waveform.
         self.play(electron_pair.animate.move_to([0,0,1.5]))
-        # self.play(Transform(electron_pair, wave_eq))
+        wave_eq = WaveFunc3d(
+            orientation=(75, 30, 0),
+            position=ORIGIN,
+            show_axes=False,
+            speed=2.0,
+            frequency=1.5,
+            turns=5,
+            r_max=0.5,
+            sigma=0.4,
+            x_span=1,
+            color=BLUE,
+            particle_color=RED,
+        )
+        spin_arrow = Arrow3D(            
+            start=ORIGIN,
+            end=np.array([0.1,0,0]),
+            color=RED,)
+        x_angle, y_angle, z_angle = float(75.0), float(30.0), float(0.0)
+        spin_dot = Dot(point=[0.5,0.0,0.0])
+        spin_dot.rotate(x_angle * DEGREES, axis=RIGHT, about_point=ORIGIN)
+        spin_dot.rotate(y_angle * DEGREES, axis=UP, about_point=ORIGIN)
+        spin_dot.rotate(z_angle * DEGREES, axis=OUT, about_point=ORIGIN)
+        spin_arrow.rotate(y_angle * DEGREES, axis=UP, about_point=ORIGIN)
+        spin_arrow.rotate(x_angle * DEGREES, axis=RIGHT, about_point=ORIGIN)
+        spin_arrow.rotate(z_angle * DEGREES, axis=OUT, about_point=ORIGIN)
+        spin_loc = spin_dot.get_center()
+        
+        self.add(spin_arrow)
+        self.play(FadeOut(electron_pair),FadeIn(wave_eq), spin_arrow.animate.put_start_and_end_on(ORIGIN, spin_loc))
+        wave_particle = VGroup(wave_eq, spin_arrow)
+        wave_particle.add_updater(lambda mob, dt: mob.rotate(dt * 2 * PI, axis=OUT))
+        
         
         # Spin the wave packet around
         
-        self.wait(1)
+        self.wait()
