@@ -81,7 +81,7 @@ class ClassicalLimitAnimation(ThreeDScene):
         # wave_3d.set_style(fill_opacity=0.6, stroke_opacity=0.2).set_color(BLUE_E)
         
         # wave_line_3d = self.create_2d_wave_function(x_min=-4, x_max = 4).rotate(PI/2, axis=[0,1,0], about_point=ORIGIN).rotate(PI/2, axis=[1,0,0], about_point=ORIGIN)
-        wave_line_3d = WaveFunc3d(orientation=(0 * DEGREES, 0 * DEGREES), show_axes=False)
+        wave_line_3d = WaveFunc3d(show_axes=False)
         wave_line_spin = Arrow3D(
             start=ORIGIN,
             end=np.array([0,1,0]),
@@ -108,7 +108,9 @@ class ClassicalLimitAnimation(ThreeDScene):
         # wave_line_2d.move_to(IN*2)
 
         self.play(
-            ReplacementTransform(wave_line_3d, wave_line_2d),
+            FadeOut(wave_line_3d),
+            FadeIn(wave_line_2d),
+            # ReplacementTransform(wave_line_3d, wave_line_2d),
             run_time=2
         )
         self.wait(1)

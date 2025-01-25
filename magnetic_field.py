@@ -1,100 +1,144 @@
 from manim import *
 import numpy as np
-def dipole_field(
-    point,
-    moment=np.array([0, 0, 1], dtype=float),
-    center=np.array([0, 0, 0], dtype=float),
-    scale=0.05
-):
-    r = point - center
-    r_norm = np.linalg.norm(r)
-    if r_norm < 1e-7:
-        return np.zeros(3, dtype=float)
-    r_hat = r / r_norm
-    return scale * ((3 * np.dot(moment, r_hat) * r_hat) - moment) / (r_norm**3)
 
-def trace_field_line(
-    start_point,
-    field_func,
-    step_size=0.03,
-    n_steps=8000,
-    direction=+1.0
-):
-    points = [np.array(start_point, dtype=float)]
-    current = np.array(start_point, dtype=float)
+class MyCurves(VGroup):
+    def __init__(
+        self,
+        t_min=0,
+        t_max=PI,
+        x1_values=None,
+        base_color=BLUE,
+        family_color=RED,
+        base_n_samples=100,
+        family_n_samples=100,
+        show_arrows=True,        
+        arrow_count_base=5,       
+        arrow_count_family=5,      
+        arrow_scale=0.1,           
+        arrow_color=WHITE,
+        flow_forward=True,         
+        **kwargs
+    ):
+        super().__init__(**kwargs)
 
-    for _ in range(n_steps):
-        B = field_func(current)
-        norm_B = np.linalg.norm(B)
-        if norm_B < 1e-9:
-            break
-        current += direction * step_size * (B / norm_B)
-        points.append(np.array(current))
+        if x1_values is None:
+            x1_values = [(k * np.pi/4) for k in range(8)]
 
-    return points
-def create_field_line_from_points(points, color=YELLOW, width=2):
-    line = VMobject()
-    line.set_points_as_corners(points)
-    line.set_stroke(color=color, width=width)
-    return line
+        self.t_min = t_min
+        self.t_max = t_max
+        self.x1_values = x1_values
+        self.base_color = base_color
+        self.family_color = family_color
+        self.show_arrows = show_arrows
+        self.arrow_count_base = arrow_count_base
+        self.arrow_count_family = arrow_count_family
+        self.arrow_scale = arrow_scale
+        self.arrow_color = arrow_color
+        self.flow_forward = flow_forward
+        base_step = (t_max - t_min) / base_n_samples
+        family_step = (t_max - t_min) / family_n_samples
 
-class MagneticFieldScene(ThreeDScene):
+        def base_func(t):
+            return np.array([
+                (2 / np.sqrt(3)) * np.cos((4/3)*t - np.pi/6),
+                0,
+                np.sin(t),
+            ])
+
+        base_curve = ParametricFunction(
+            base_func,
+            t_range=(t_min, t_max, base_step),
+            color=self.base_color,
+        )
+        self.add(base_curve)
+
+        if self.show_arrows and self.arrow_count_base > 0:
+            arrows_for_base = self._make_arrows_along_curve(
+                base_curve, base_func, self.arrow_count_base
+            )
+            self.add(*arrows_for_base)
+
+        def family_func_factory(x1):
+            
+            def f(t):
+                return np.array([
+                    (2 / np.sqrt(3)) * np.cos((4/3)*t - np.pi/6),
+                    np.sin(x1) * np.sin(t),
+                    np.cos(x1) * np.sin(t),
+                ])
+            return f
+
+        for x1 in self.x1_values:
+            ffunc = family_func_factory(x1)
+            family_curve = ParametricFunction(
+                ffunc,
+                t_range=(t_min, t_max, family_step),
+                color=self.family_color,
+            )
+            self.add(family_curve)
+
+            if self.show_arrows and self.arrow_count_family > 0:
+                arrows_for_this = self._make_arrows_along_curve(
+                    family_curve, ffunc, self.arrow_count_family
+                )
+                self.add(*arrows_for_this)
+
+    def _make_arrows_along_curve(self, curve_mobj, func, n_arrows):
+        arrows = []
+        t_vals = np.linspace(self.t_min, self.t_max, n_arrows)
+
+        for t in t_vals:
+            point = func(t)
+            tangent = self._approx_tangent(func, t)
+
+            if not self.flow_forward:
+                tangent = -tangent
+
+            arrow = Cone(
+                base_radius=self.arrow_scale * 0.5, 
+                height=self.arrow_scale,
+                direction=OUT,  
+                show_base=False,
+                fill_opacity=1.0,
+                color=self.arrow_color
+            ).set_fill(color = self.arrow_color, opacity = .75)
+           
+            arrow.set_direction(tangent)
+
+            arrow.shift(point)
+
+            arrows.append(arrow)
+        return arrows
+
+    def _approx_tangent(self, func, t, eps=1e-5):
+        p1 = func(t + eps)
+        p2 = func(t - eps)
+        tangent = p1 - p2
+        norm = np.linalg.norm(tangent)
+        if norm < 1e-12:
+
+            return OUT
+        return tangent / norm
+    
+    
+#example implemetnation
+class ShowCurves(ThreeDScene):
     def construct(self):
-        axes = ThreeDAxes(
-            x_range=[-2, 2, 1],
-            y_range=[-2, 2, 1],
-            z_range=[-2, 2, 1],
-            axis_config={"stroke_width": 2}
+        curve_group = MyCurves(
+            t_min=0,
+            t_max=PI,
+            x1_values=[k*np.pi/4 for k in range(8)],
+            base_color=BLUE,
+            family_color=RED,
+            base_n_samples=150,
+            family_n_samples=150,
+            show_arrows=True,
+            arrow_count_base=5,
+            arrow_count_family=5,
+            arrow_scale=0.1,
+            arrow_color=RED,
+            flow_forward=True,  
         )
-        self.add(axes)
-
-        self.set_camera_orientation(phi=65 * DEGREES, theta=-45 * DEGREES)
-
-        dipole_moment = np.array([1, 0, 0], dtype=float)
-        dipole_center = np.array([0, 0, 0], dtype=float)
-        scale_factor  = 0.05  
-        magnet = Cylinder(
-            radius=0.2,
-            height=2,
-            direction=UP,
-            v_range=[-1, 1],
-            fill_opacity=0.6,
-            fill_color=BLUE,
-        )
-        self.add(magnet)
-
-        seed_points = []
-        z_top = 1.1
-        for radius in np.arange(0.1, 0.2, 0.1):  
-            for angle_deg in [0, 90, 180, 270]:
-                angle = angle_deg * DEGREES
-                x = radius * np.cos(angle)
-                y = radius * np.sin(angle)
-                seed_points.append(np.array([x, y, z_top]))
-
-        field_lines = []
-        for seed in seed_points:
-            plus_trace = trace_field_line(
-                start_point=seed,
-                field_func=lambda p: dipole_field(
-                    p, dipole_moment, dipole_center, scale_factor
-                ),
-                step_size=0.03,
-                n_steps=8000,
-                direction=+1
-            )
-            minus_trace = trace_field_line(
-                start_point=seed,
-                field_func=lambda p: dipole_field(
-                    p, dipole_moment, dipole_center, scale_factor
-                ),
-                step_size=0.03,
-                n_steps=8000,
-                direction=-1
-            )
-
-            plus_line  = create_field_line_from_points(plus_trace,  color=BLUE, width=2)
-            minus_line = create_field_line_from_points(minus_trace, color=BLUE, width=2)
-            field_lines.extend([plus_line, minus_line])
-        self.add(*field_lines)
-        self.wait(4)
+        self.set_camera_orientation(phi=70*DEGREES, theta=30*DEGREES, distance=6)
+        self.add(curve_group)
+        self.wait(3)

@@ -1,0 +1,28 @@
+1
+00:00:00,000 --> 00:00:03,551
+We developed a technique called lattice engineering to address this
+
+2
+00:00:03,651 --> 00:00:07,475
+problem and create usable ordered structures of Nitrogen Vacancy Centers
+
+3
+00:00:10,800 --> 00:00:14,566
+Since NV centers require higher energy the closer together they are,
+
+4
+00:00:14,666 --> 00:00:17,440
+we can apply a low energy light pulse
+
+5
+00:00:18,600 --> 00:00:21,451
+to the diamond to only excite defects
+
+6
+00:00:21,600 --> 00:00:23,250
+that are far away
+
+7
+00:00:23,400 --> 00:00:24,998
+from other defects,
+

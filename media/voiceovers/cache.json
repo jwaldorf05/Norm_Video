@@ -1,0 +1,464 @@
+[
+  {
+    "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of NV Centers.",
+    "input_data": {
+      "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of NV Centers.",
+      "config": {
+        "format": 8,
+        "channels": 1,
+        "rate": 44100,
+        "chunk": 512
+      },
+      "service": "recorder"
+    },
+    "original_audio": "we-developed-a-technique-called-lattice-4025a467.mp3",
+    "word_boundaries": [
+      {
+        "audio_offset": 1600000,
+        "text_offset": 0,
+        "word_length": 3,
+        "text": " We",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 2600000,
+        "text_offset": 3,
+        "word_length": 10,
+        "text": " developed",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 6400000,
+        "text_offset": 13,
+        "word_length": 2,
+        "text": " a",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 9200000,
+        "text_offset": 15,
+        "word_length": 10,
+        "text": " technique",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 16800000,
+        "text_offset": 25,
+        "word_length": 7,
+        "text": " called",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 17800000,
+        "text_offset": 32,
+        "word_length": 8,
+        "text": " lattice",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 21400000,
+        "text_offset": 40,
+        "word_length": 12,
+        "text": " engineering",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 31200000,
+        "text_offset": 52,
+        "word_length": 3,
+        "text": " to",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32200000,
+        "text_offset": 55,
+        "word_length": 8,
+        "text": " address",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 35400000,
+        "text_offset": 63,
+        "word_length": 5,
+        "text": " this",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 37800000,
+        "text_offset": 68,
+        "word_length": 8,
+        "text": " problem",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 45000000,
+        "text_offset": 76,
+        "word_length": 4,
+        "text": " and",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 46000000,
+        "text_offset": 80,
+        "word_length": 7,
+        "text": " create",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 49400000,
+        "text_offset": 87,
+        "word_length": 7,
+        "text": " usable",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 58400000,
+        "text_offset": 94,
+        "word_length": 8,
+        "text": " ordered",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 60599999,
+        "text_offset": 102,
+        "word_length": 11,
+        "text": " structures",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 65400000,
+        "text_offset": 113,
+        "word_length": 3,
+        "text": " of",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 68200000,
+        "text_offset": 116,
+        "word_length": 3,
+        "text": " NV",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 71000000,
+        "text_offset": 119,
+        "word_length": 9,
+        "text": " centers.",
+        "boundary_type": "Word"
+      }
+    ],
+    "transcribed_text": " We developed a technique called lattice engineering to address this problem and create usable ordered structures of NV centers.",
+    "final_audio": "we-developed-a-technique-called-lattice-4025a467.mp3"
+  },
+  {
+    "input_text": "Since NV centers gave higher energy the closer they are,",
+    "input_data": {
+      "input_text": "Since NV centers gave higher energy the closer they are,",
+      "config": {
+        "format": 8,
+        "channels": 1,
+        "rate": 44100,
+        "chunk": 512
+      },
+      "service": "recorder"
+    },
+    "original_audio": "since-nv-centers-gave-higher-energy-the-closer-efb41a96.mp3",
+    "word_boundaries": [
+      {
+        "audio_offset": 3600000,
+        "text_offset": 0,
+        "word_length": 6,
+        "text": " Since",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 5800000,
+        "text_offset": 6,
+        "word_length": 5,
+        "text": " envy",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 9200000,
+        "text_offset": 11,
+        "word_length": 8,
+        "text": " centers",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 13799999,
+        "text_offset": 19,
+        "word_length": 8,
+        "text": " require",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 20400000,
+        "text_offset": 27,
+        "word_length": 7,
+        "text": " higher",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 24600000,
+        "text_offset": 34,
+        "word_length": 8,
+        "text": " energy,",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 31600000,
+        "text_offset": 42,
+        "word_length": 4,
+        "text": " the",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 34200000,
+        "text_offset": 46,
+        "word_length": 7,
+        "text": " closer",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 36000000,
+        "text_offset": 53,
+        "word_length": 9,
+        "text": " together",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 41200000,
+        "text_offset": 62,
+        "word_length": 5,
+        "text": " they",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 43400000,
+        "text_offset": 67,
+        "word_length": 5,
+        "text": " are.",
+        "boundary_type": "Word"
+      }
+    ],
+    "transcribed_text": " Since envy centers require higher energy, the closer together they are.",
+    "final_audio": "since-nv-centers-gave-higher-energy-the-closer-efb41a96.mp3"
+  },
+  {
+    "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of NV Centers.",
+    "input_data": {
+      "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of NV Centers.",
+      "service": "coqui"
+    },
+    "original_audio": "we-developed-a-technique-called-lattice-afb055f8.mp3",
+    "final_audio": "we-developed-a-technique-called-lattice-afb055f8_adjusted.mp3"
+  },
+  {
+    "input_text": "Since NV centers gave higher energy the closer they are,",
+    "input_data": {
+      "input_text": "Since NV centers gave higher energy the closer they are,",
+      "service": "coqui"
+    },
+    "original_audio": "since-nv-centers-gave-higher-energy-the-closer-cb817257.mp3",
+    "final_audio": "since-nv-centers-gave-higher-energy-the-closer-cb817257_adjusted.mp3"
+  },
+  {
+    "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of NV Centers.",
+    "input_data": {
+      "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of NV Centers.",
+      "service": "coqui"
+    },
+    "original_audio": "we-developed-a-technique-called-lattice-afb055f8.mp3",
+    "final_audio": "we-developed-a-technique-called-lattice-afb055f8_adjusted.mp3"
+  },
+  {
+    "input_text": "Since NV centers gave higher energy the closer they are,",
+    "input_data": {
+      "input_text": "Since NV centers gave higher energy the closer they are,",
+      "service": "coqui"
+    },
+    "original_audio": "since-nv-centers-gave-higher-energy-the-closer-cb817257.mp3",
+    "final_audio": "since-nv-centers-gave-higher-energy-the-closer-cb817257_adjusted.mp3"
+  },
+  {
+    "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of Enn Vee Centers.",
+    "input_data": {
+      "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of Enn Vee Centers.",
+      "service": "coqui"
+    },
+    "original_audio": "we-developed-a-technique-called-lattice-99225c44.mp3",
+    "final_audio": "we-developed-a-technique-called-lattice-99225c44_adjusted.mp3"
+  },
+  {
+    "input_text": "Since NV centers require higher energy the closer together they are,",
+    "input_data": {
+      "input_text": "Since NV centers require higher energy the closer together they are,",
+      "service": "coqui"
+    },
+    "original_audio": "since-nv-centers-require-higher-energy-the-closer-1dd26ec7.mp3",
+    "final_audio": "since-nv-centers-require-higher-energy-the-closer-1dd26ec7_adjusted.mp3"
+  },
+  {
+    "input_text": "we can apply a low energy light pulse",
+    "input_data": {
+      "input_text": "we can apply a low energy light pulse",
+      "service": "coqui"
+    },
+    "original_audio": "we-can-apply-a-low-energy-light-pulse-7527f77e.mp3",
+    "final_audio": "we-can-apply-a-low-energy-light-pulse-7527f77e_adjusted.mp3"
+  },
+  {
+    "input_text": "to the diamond to only excite defects",
+    "input_data": {
+      "input_text": "to the diamond to only excite defects",
+      "service": "coqui"
+    },
+    "original_audio": "to-the-diamond-to-only-excite-defects-fcbfae94.mp3",
+    "final_audio": "to-the-diamond-to-only-excite-defects-fcbfae94_adjusted.mp3"
+  },
+  {
+    "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of Enn Vee Centers.",
+    "input_data": {
+      "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of Enn Vee Centers.",
+      "service": "coqui"
+    },
+    "original_audio": "we-developed-a-technique-called-lattice-99225c44.mp3",
+    "final_audio": "we-developed-a-technique-called-lattice-99225c44_adjusted.mp3"
+  },
+  {
+    "input_text": "Since NV centers require higher energy the closer together they are,",
+    "input_data": {
+      "input_text": "Since NV centers require higher energy the closer together they are,",
+      "service": "coqui"
+    },
+    "original_audio": "since-nv-centers-require-higher-energy-the-closer-1dd26ec7.mp3",
+    "final_audio": "since-nv-centers-require-higher-energy-the-closer-1dd26ec7_adjusted.mp3"
+  },
+  {
+    "input_text": "we can apply a low energy light pulse",
+    "input_data": {
+      "input_text": "we can apply a low energy light pulse",
+      "service": "coqui"
+    },
+    "original_audio": "we-can-apply-a-low-energy-light-pulse-7527f77e.mp3",
+    "final_audio": "we-can-apply-a-low-energy-light-pulse-7527f77e_adjusted.mp3"
+  },
+  {
+    "input_text": "to the diamond to only excite defects",
+    "input_data": {
+      "input_text": "to the diamond to only excite defects",
+      "service": "coqui"
+    },
+    "original_audio": "to-the-diamond-to-only-excite-defects-fcbfae94.mp3",
+    "final_audio": "to-the-diamond-to-only-excite-defects-fcbfae94_adjusted.mp3"
+  },
+  {
+    "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of Enn Vee Centers.",
+    "input_data": {
+      "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of Enn Vee Centers.",
+      "service": "coqui"
+    },
+    "original_audio": "we-developed-a-technique-called-lattice-99225c44.mp3",
+    "final_audio": "we-developed-a-technique-called-lattice-99225c44_adjusted.mp3"
+  },
+  {
+    "input_text": "Since NV centers require higher energy the closer together they are,",
+    "input_data": {
+      "input_text": "Since NV centers require higher energy the closer together they are,",
+      "service": "coqui"
+    },
+    "original_audio": "since-nv-centers-require-higher-energy-the-closer-1dd26ec7.mp3",
+    "final_audio": "since-nv-centers-require-higher-energy-the-closer-1dd26ec7_adjusted.mp3"
+  },
+  {
+    "input_text": "we can apply a low energy light pulse",
+    "input_data": {
+      "input_text": "we can apply a low energy light pulse",
+      "service": "coqui"
+    },
+    "original_audio": "we-can-apply-a-low-energy-light-pulse-7527f77e.mp3",
+    "final_audio": "we-can-apply-a-low-energy-light-pulse-7527f77e_adjusted.mp3"
+  },
+  {
+    "input_text": "to the diamond to only excite defects",
+    "input_data": {
+      "input_text": "to the diamond to only excite defects",
+      "service": "coqui"
+    },
+    "original_audio": "to-the-diamond-to-only-excite-defects-fcbfae94.mp3",
+    "final_audio": "to-the-diamond-to-only-excite-defects-fcbfae94_adjusted.mp3"
+  },
+  {
+    "input_text": "that are far away",
+    "input_data": {
+      "input_text": "that are far away",
+      "service": "coqui"
+    },
+    "original_audio": "that-are-far-away-7d74ede8.mp3",
+    "final_audio": "that-are-far-away-7d74ede8_adjusted.mp3"
+  },
+  {
+    "input_text": "from other defects,",
+    "input_data": {
+      "input_text": "from other defects,",
+      "service": "coqui"
+    },
+    "original_audio": "from-other-defects-f4c20d6a.mp3",
+    "final_audio": "from-other-defects-f4c20d6a_adjusted.mp3"
+  },
+  {
+    "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of Nitrogen Vacancy Centers",
+    "input_data": {
+      "input_text": "We developed a technique called lattice engineering to address this problem and create usable ordered structures of Nitrogen Vacancy Centers",
+      "service": "coqui"
+    },
+    "original_audio": "we-developed-a-technique-called-lattice-e74ce469.mp3",
+    "final_audio": "we-developed-a-technique-called-lattice-e74ce469_adjusted.mp3"
+  },
+  {
+    "input_text": "Since NV centers require higher energy the closer together they are,",
+    "input_data": {
+      "input_text": "Since NV centers require higher energy the closer together they are,",
+      "service": "coqui"
+    },
+    "original_audio": "since-nv-centers-require-higher-energy-the-closer-1dd26ec7.mp3",
+    "final_audio": "since-nv-centers-require-higher-energy-the-closer-1dd26ec7_adjusted.mp3"
+  },
+  {
+    "input_text": "we can apply a low energy light pulse",
+    "input_data": {
+      "input_text": "we can apply a low energy light pulse",
+      "service": "coqui"
+    },
+    "original_audio": "we-can-apply-a-low-energy-light-pulse-7527f77e.mp3",
+    "final_audio": "we-can-apply-a-low-energy-light-pulse-7527f77e_adjusted.mp3"
+  },
+  {
+    "input_text": "to the diamond to only excite defects",
+    "input_data": {
+      "input_text": "to the diamond to only excite defects",
+      "service": "coqui"
+    },
+    "original_audio": "to-the-diamond-to-only-excite-defects-fcbfae94.mp3",
+    "final_audio": "to-the-diamond-to-only-excite-defects-fcbfae94_adjusted.mp3"
+  },
+  {
+    "input_text": "that are far away",
+    "input_data": {
+      "input_text": "that are far away",
+      "service": "coqui"
+    },
+    "original_audio": "that-are-far-away-7d74ede8.mp3",
+    "final_audio": "that-are-far-away-7d74ede8_adjusted.mp3"
+  },
+  {
+    "input_text": "from other defects,",
+    "input_data": {
+      "input_text": "from other defects,",
+      "service": "coqui"
+    },
+    "original_audio": "from-other-defects-f4c20d6a.mp3",
+    "final_audio": "from-other-defects-f4c20d6a_adjusted.mp3"
+  }
+]

@@ -2,7 +2,7 @@ from manim import *
 import numpy as np
 import random
 import matplotlib as plt
-from magnetic_field import * # magnetic_field.py
+from test1 import * # magnetic_field.py
 
 
 # Camera Fix from https://gist.github.com/abul4fia/1419b181e8e3410ef78e6acc25c3df94#file-fixed_fixing-py-L13
@@ -95,55 +95,68 @@ class DipoleRotation(ThreeDScene):
         
         # Create Magnetic Field
         
-        # Define the dipole orientation (any arbitrary direction)
-        dipole_direction = spin_direction  # Example: A diagonal vector
-        dipole_direction = dipole_direction / np.linalg.norm(dipole_direction)  # Normalize
+        # # Define the dipole orientation (any arbitrary direction)
+        # dipole_direction = spin_direction  # Example: A diagonal vector
+        # dipole_direction = dipole_direction / np.linalg.norm(dipole_direction)  # Normalize
         
         
-        dipole_moment = np.array([1, 0, 0], dtype=float)
-        dipole_center = np.array([0, 0, 0], dtype=float)
-        scale_factor  = 0.05  
+        # dipole_moment = np.array([1, 0, 0], dtype=float)
+        # dipole_center = np.array([0, 0, 0], dtype=float)
+        # scale_factor  = 0.05  
         
-        seed_points = []
-        x_top = 1.1
-        # for radius in [0.1]:  
-        radius = 1
-        for angle_deg in [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
-        # for angle_deg in [0, 90, 180, 270]:
-            angle = angle_deg * DEGREES
-            y = radius * np.cos(angle)
-            z = radius * np.sin(angle)
-            seed_points.append(np.array([x_top, y, z]))
+        # seed_points = []
+        # x_top = 1.1
+        # # for radius in [0.1]:  
+        # radius = 1
+        # for angle_deg in [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
+        # # for angle_deg in [0, 90, 180, 270]:
+        #     angle = angle_deg * DEGREES
+        #     y = radius * np.cos(angle)
+        #     z = radius * np.sin(angle)
+        #     seed_points.append(np.array([x_top, y, z]))
 
-        field_lines = []
-        for seed in seed_points:
-            plus_trace = trace_field_line(
-                start_point=seed,
-                field_func=lambda p: dipole_field(
-                    p, dipole_moment, dipole_center, scale_factor
-                ),
-                step_size=0.03,
-                n_steps=12000,
-                direction=+1
-            )
-            minus_trace = trace_field_line(
-                start_point=seed,
-                field_func=lambda p: dipole_field(
-                    p, dipole_moment, dipole_center, scale_factor
-                ),
-                step_size=0.03,
-                n_steps=12000,
-                direction=-1
-            )
+        # field_lines = []
+        # for seed in seed_points:
+        #     plus_trace = trace_field_line(
+        #         start_point=seed,
+        #         field_func=lambda p: dipole_field(
+        #             p, dipole_moment, dipole_center, scale_factor
+        #         ),
+        #         step_size=0.03,
+        #         n_steps=12000,
+        #         direction=+1
+        #     )
+        #     minus_trace = trace_field_line(
+        #         start_point=seed,
+        #         field_func=lambda p: dipole_field(
+        #             p, dipole_moment, dipole_center, scale_factor
+        #         ),
+        #         step_size=0.03,
+        #         n_steps=12000,
+        #         direction=-1
+        #     )
 
-            plus_line  = create_field_line_from_points(plus_trace,  color=BLUE, width=2)
-            minus_line = create_field_line_from_points(minus_trace, color=BLUE, width=2)
-            field_lines.extend([plus_line, minus_line])
+        #     plus_line  = create_field_line_from_points(plus_trace,  color=BLUE, width=2)
+        #     minus_line = create_field_line_from_points(minus_trace, color=BLUE, width=2)
+        #     field_lines.extend([plus_line, minus_line])
+        curve_group = MyCurves(
+            t_min=0,
+            t_max=PI,
+            x1_values=[k*np.pi/4 for k in range(8)],
+            base_color=BLUE,
+            family_color=BLUE,
+            show_arrows=True,
+            arrow_count_base=5,
+            arrow_count_family=5,
+            arrow_scale=0.1,
+            arrow_color=BLUE,
+            flow_forward=True,  
+        )
         
         
-        self.play(FadeIn(B_label_blue), FadeIn(*field_lines))
+        self.play(FadeIn(B_label_blue), FadeIn(curve_group))
         self.wait(0.5)
-        self.play(FadeOut(B_label_blue), FadeOut(*field_lines))
+        self.play(FadeOut(B_label_blue), FadeOut(curve_group))
         
         # Create the bar magnet
         magnet_length = 1.6
@@ -215,9 +228,6 @@ class DipoleRotation(ThreeDScene):
         self.wait(1)
         self.play(
             Transform(vector_field, vector_field_2),B_label_green.animate.set_stroke(width=.5), magnet_spin_rate.animate.set_value(0.5))
-
-        # magnet.clear_updaters()
-        # magnet.add_updater(lambda mob, dt: rotate_and_track(mob, dt, rate=.5))
         
         
         self.wait(1.25)
@@ -293,9 +303,6 @@ class DipoleRotation(ThreeDScene):
         return np.array([x, y, z])
 
     def fix_orientations(self, *mob):
-        # camera_orientation = self.camera.generate_rotation_matrix()
-        # for obj in mob:
-        #     obj.apply_matrix(camera_orientation)
         self.add_fixed_orientation_mobjects(*mob)
         self.remove(*mob)
         

@@ -2,11 +2,21 @@ from manim import *
 import numpy as np
 import random
 from laserbeam import * # laserbeam.py
+# from manim_voiceover import *
 
-# 
+# from manim_voiceover.services.azure import AzureService
+# from manim_voiceover.services.recorder import RecorderService
+# from manim_voiceover.services.coqui import CoquiService
+
+# manim -pqh lattice_engineering.py Lattice_Engineering_Animation
 
 class Lattice_Engineering_Animation(Scene):
     def construct(self):
+        # self.set_speech_service(AzureService(voice="en-US-AriaNeural",style="newscast-casual",global_speed=1.25)) # MS Azure Voice
+        
+        # self.set_speech_service(RecorderService())
+        # self.set_speech_service(CoquiService(model_name="tts_models/en/ljspeech/tacotron2-DDC", global_speed=1.25))
+        
         # Show a bunch of NV center white dots
         # Define the square
         square = Square(side_length=4)
@@ -14,9 +24,6 @@ class Lattice_Engineering_Animation(Scene):
         square.set_fill(color=BLACK, opacity=1)  # Optional fill for better contrast
         
         nv_label = Text("NV Center Diamond", font_size=36).move_to([0, 2.4 ,0])
-
-        # Add the square to the scene
-        self.play(Write(square), FadeIn(nv_label))
 
         # Generate 100 white dots within the square
         dots = VGroup()  # Group to hold all the dots
@@ -29,12 +36,17 @@ class Lattice_Engineering_Animation(Scene):
             dot = Dot(point=[x, y, 0], color=WHITE, radius=.03)
             dots.add(dot)
 
+        dots_spawning = AnimationGroup([FadeIn(dots[index],run_time=(0.05 - 0.05*(random.randint(1,50)/100))) for index in np.arange(len(dots))],lag_ratio=1)
         # Add the dots to the scene
-        # self.add(dots)
-        for index in np.arange(len(dots)):
-            num = random.randint(1,50)
-            self.add(dots[index])
-            self.wait(0.05 - 0.05*(num/100))
+        # for index in np.arange(len(dots)):
+        #     num = random.randint(1,50)
+        #     FadeIn(dots[index],run_time=(0.05 - 0.05*(num/100)))
+            # self.wait(0.05 - 0.05*(num/100))
+            
+        init_group = AnimationGroup(Write(square), FadeIn(nv_label), dots_spawning, lag_ratio=1)
+        # Add the square to the scene
+        with self.voiceover(text="We developed a technique called lattice engineering to address this problem and create usable ordered structures of Nitrogen Vacancy Centers") as tracker:
+            self.play(init_group, run_time = tracker.duration)
         
         # Turn the dimers red, and then back to white
         
@@ -82,8 +94,7 @@ class Lattice_Engineering_Animation(Scene):
             [2.5, -2, 0],
             [2.5, 2, 0],
         ]).set_stroke(color=WHITE, width=2)
-        self.play([FadeIn(x) for x in [energy_box, energy_label]])
-        
+            
         state_lines = VGroup(
             Line(
             start=[3, 1, 0],  # Starting point (x, y, z)
@@ -130,9 +141,17 @@ class Lattice_Engineering_Animation(Scene):
         dimer = VGroup(dimer_dot, dimer_label)
         normal = VGroup(normal_dot, normal_label)
         
-        self.play(Create(state_lines))
-        self.play([FadeIn(x, shift=RIGHT) for x in [pos_label, neg_label, ground_label]])
-        self.play(FadeIn(x) for x in [dimer, normal])
+        
+        energy_table_animations = AnimationGroup(
+            [FadeIn(x) for x in [energy_box, energy_label]], 
+            Create(state_lines),
+            [FadeIn(x, shift=RIGHT) for x in [pos_label, neg_label, ground_label]],
+            [FadeIn(x) for x in [dimer, normal]],
+            lag_ratio=1.0)
+        
+        with self.voiceover(text="Since NV centers require higher energy the closer together they are,") as tracker:
+            self.play(energy_table_animations, run_time = tracker.duration)
+        
         
         # Excite and return arrows:
         dimer_excite_arrow = Vector([0,2], color=BLUE).shift([2.9,-.95,0])
@@ -157,7 +176,8 @@ class Lattice_Engineering_Animation(Scene):
         laser_gun.set_stroke(color=WHITE, width=4)
         
         # Add the open shape to the scene
-        self.play(FadeIn(laser_gun),Write(laser_label))
+        with self.voiceover(text="we can apply a low energy light pulse") as tracker:
+            self.play(FadeIn(laser_gun),Write(laser_label), run_time = tracker.duration)
 
         pulse_green = LaserPulse(
             start = np.array([-5, 0, 0]),  
@@ -184,14 +204,16 @@ class Lattice_Engineering_Animation(Scene):
 
         # Raise normal NV centers to -1, make green
         self.wait(1)
-        self.play(pulse_green.animate_pulse(run_time=1))
-        self.play(FadeIn(normal_excite_arrow), run_time=.25)
+        with self.voiceover(text="to the diamond to only excite defects") as tracker:
+            self.play(AnimationGroup(pulse_green.animate_pulse(run_time=1)), run_time=tracker.duration)
+        # self.play( run_time=.25)
         # self.play(normal.animate.shift(UP))
         normal_raise = AnimationGroup(normal.animate.shift(UP),normal.animate.set_color(GREEN), normals.animate.set_color(GREEN), run_time=0.5)
-        self.play(normal_raise)
-        self.play(normal.animate.shift(UP))
-        # normal_dot.set_color(GREEN).move_to([4.4,0,0])
-        # normal_label.set_color(GREEN).move_to([4.4,-.4,0])
+        with self.voiceover(text="that are far away") as tracker:
+            self.play(normal_raise, run_time = tracker.duration)
+        with self.voiceover(text="from other defects,") as tracker:
+            self.play(FadeIn(normal_excite_arrow), normal.animate.shift(UP), run_time = tracker.duration)
+        self.voiceover(text="and bring them into a medium-energy state.")
         
         
         # Raise dimers to +1, make blue
@@ -199,10 +221,10 @@ class Lattice_Engineering_Animation(Scene):
         self.play(FadeOut(normal_excite_arrow), run_time=.25)
         self.play(pulse_blue.animate_pulse(run_time=1))
         # self.play(dimer.animate.shift(2 * UP))
-        self.play(FadeIn(dimer_excite_arrow), run_time=.25)
+        # self.play(run_time=.25)
         dimer_raise = AnimationGroup(dimer.animate.set_color(BLUE),dimers.animate.set_color(BLUE), run_time=0.5)
         self.play(dimer_raise)
-        self.play(dimer.animate.shift(2 * UP))
+        self.play(FadeIn(dimer_excite_arrow), dimer.animate.shift(2 * UP))
         # dimer_dot.set_color(BLUE).move_to([3.4,1,0])
         # dimer_label.set_color(BLUE).move_to([3.4,.6,0])
         
@@ -211,10 +233,10 @@ class Lattice_Engineering_Animation(Scene):
         self.wait(1)
         self.play(FadeOut(dimer_excite_arrow), run_time=.25)
         self.play(pulse_green.animate_pulse(run_time=1))
-        self.play(FadeIn(normal_return_arrow), run_time=.25)
+        # self.play( run_time=.25)
         normal_lower = AnimationGroup(normal.animate.set_color(WHITE),normals.animate.set_color(WHITE), run_time=0.5)
         self.play(normal_lower)
-        self.play(normal.animate.shift(DOWN))
+        self.play(FadeIn(normal_return_arrow), normal.animate.shift(DOWN))
         # normal_dot.set_color(WHITE).move_to([4.4,-1,0])
         # normal_label.set_color(WHITE).move_to([4.4,-1.4,0])
         
