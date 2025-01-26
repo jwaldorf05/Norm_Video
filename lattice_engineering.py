@@ -45,8 +45,8 @@ class Lattice_Engineering_Animation(Scene):
             
         init_group = AnimationGroup(Write(square), FadeIn(nv_label), dots_spawning, lag_ratio=1)
         # Add the square to the scene
-        with self.voiceover(text="We developed a technique called lattice engineering to address this problem and create usable ordered structures of Nitrogen Vacancy Centers") as tracker:
-            self.play(init_group, run_time = tracker.duration)
+        # with self.voiceover(text="We developed a technique called lattice engineering to address this problem and create usable ordered structures of Nitrogen Vacancy Centers") as tracker:
+        self.play(init_group, run_time = tracker.duration)
         
         # Turn the dimers red, and then back to white
         
@@ -149,8 +149,8 @@ class Lattice_Engineering_Animation(Scene):
             [FadeIn(x) for x in [dimer, normal]],
             lag_ratio=1.0)
         
-        with self.voiceover(text="Since NV centers require higher energy the closer together they are,") as tracker:
-            self.play(energy_table_animations, run_time = tracker.duration)
+        # with self.voiceover(text="Since NV centers require higher energy the closer together they are,") as tracker:
+        self.play(energy_table_animations)
         
         
         # Excite and return arrows:
@@ -176,8 +176,8 @@ class Lattice_Engineering_Animation(Scene):
         laser_gun.set_stroke(color=WHITE, width=4)
         
         # Add the open shape to the scene
-        with self.voiceover(text="we can apply a low energy light pulse") as tracker:
-            self.play(FadeIn(laser_gun),Write(laser_label), run_time = tracker.duration)
+        # with self.voiceover(text="we can apply a low energy light pulse") as tracker:
+        self.play(FadeIn(laser_gun),Write(laser_label))
 
         pulse_green = LaserPulse(
             start = np.array([-5, 0, 0]),  
@@ -204,16 +204,16 @@ class Lattice_Engineering_Animation(Scene):
 
         # Raise normal NV centers to -1, make green
         self.wait(1)
-        with self.voiceover(text="to the diamond to only excite defects") as tracker:
-            self.play(AnimationGroup(pulse_green.animate_pulse(run_time=1)), run_time=tracker.duration)
+        # with self.voiceover(text="to the diamond to only excite defects") as tracker:
+        self.play(AnimationGroup(pulse_green.animate_pulse(run_time=1)))
         # self.play( run_time=.25)
         # self.play(normal.animate.shift(UP))
         normal_raise = AnimationGroup(normal.animate.shift(UP),normal.animate.set_color(GREEN), normals.animate.set_color(GREEN), run_time=0.5)
-        with self.voiceover(text="that are far away") as tracker:
-            self.play(normal_raise, run_time = tracker.duration)
-        with self.voiceover(text="from other defects,") as tracker:
-            self.play(FadeIn(normal_excite_arrow), normal.animate.shift(UP), run_time = tracker.duration)
-        self.voiceover(text="and bring them into a medium-energy state.")
+        # with self.voiceover(text="that are far away") as tracker:
+        self.play(normal_raise, run_time = 0.5)
+        # with self.voiceover(text="from other defects,") as tracker:
+        self.play(FadeIn(normal_excite_arrow), normal.animate.shift(UP), run_time = 1)
+        # self.voiceover(text="and bring them into a medium-energy state.")
         
         
         # Raise dimers to +1, make blue

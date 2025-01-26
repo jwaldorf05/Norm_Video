@@ -62,10 +62,7 @@ class NVCenter(ThreeDScene):
                     )
                                 
         diamond_lattice.scale(0.5).move_to([0,0,0])
-        # diamond_lattice.z_index = 2
         lattice_bonds.scale(0.5).move_to([0,0,0])
-        # lattice_bonds.z_index = 2
-        # diamond_lattice.set_opacity(min(1, max(0, 1 - dist / lens_border.radius)))
         self.add(lattice_bonds, diamond_lattice)
         
         lens_border = Circle(radius=2, color=BLUE_B).set_stroke(width=6)
@@ -90,7 +87,6 @@ class NVCenter(ThreeDScene):
         replacement_location = np.array([0.75,-0.75,0])
         
         # nitrogen = Sphere(radius=a * 0.1,resolution=8, color=BLUE, stroke_opacity=0).move_to(replacement_location).set_fill(color=BLUE, opacity=1)
-        # nitrogen.z_index = 2
         error_tolerance = 0.05
         
         for carbon in diamond_lattice:
@@ -114,7 +110,6 @@ class NVCenter(ThreeDScene):
         e1 = Sphere(radius=a * 0.025,resolution=8, color=BLUE, stroke_opacity=0).move_to(e1_pos).set_fill(color=BLUE, opacity=0.5)
         e2 = Sphere(radius=a * 0.025,resolution=8, color=BLUE, stroke_opacity=0).move_to(e2_pos).set_fill(color=BLUE, opacity=0.5)
         electron_pair = VGroup(e1, e2)
-        # electron_pair.z_index = 2
         self.play(FadeIn(electron_pair))
         
         # Create Vacancy
@@ -124,7 +119,6 @@ class NVCenter(ThreeDScene):
         
         self.wait(1)
         # Move electron pair into hole, and make it into a spinning wave equation
-        # wave_eq = waveform.
         self.play(electron_pair.animate.move_to(vacancy_location))
         x_angle, y_angle, z_angle = float(0.0), float(45.0), float(45.0)
         wave_eq = WaveFunc3d(
