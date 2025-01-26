@@ -21,10 +21,10 @@ class ClassicalLimitAnimation(ThreeDScene):
             mob.rotate(angle_increment, axis=rotation_axis, about_point=ORIGIN)
             # rotation_tracker.increment_value(angle_increment)
 
-        def shake_object(mob, dt):
-            """Shakes Mobject about the 'shake_direction', at 'rate' cycles per second"""
-            movement_increment = sphere_shake_amplitude.get_value() * dt * np.cos(dt * sphere_shake_rate.get_value() * 2 * PI)  # Rotation increment per frame
-            mob.shift(movement_increment * UP)
+        # def shake_object(mob, dt):
+        #     """Shakes Mobject about the 'shake_direction', at 'rate' cycles per second"""
+        #     movement_increment = sphere_shake_amplitude.get_value() * dt * np.cos(dt * sphere_shake_rate.get_value() * 2 * PI)  # Rotation increment per frame
+        #     mob.shift(movement_increment * UP)
         
         
         self.set_camera_orientation(phi=80 * DEGREES,theta=30*DEGREES, distance = 6)
@@ -41,6 +41,8 @@ class ClassicalLimitAnimation(ThreeDScene):
             fill_opacity=0.1
         )
         sphere_mesh.set_color(BLUE)
+        
+        particle_label = Text("particle", font_size=36).move_to([0,2.5,0]) # Particle label
 
         #Axes labels
         x_label = Text("x").scale(0.4).move_to([sphere_radius+0.3,0,0])
@@ -54,12 +56,13 @@ class ClassicalLimitAnimation(ThreeDScene):
         )
 
         self.add(sphere_mesh, arrow_3d)
+        self.add_fixed_in_frame_mobjects(particle_label)
         # self.add_fixed_orientation_mobjects(x_label, y_label, z_label)
         self.wait(1)
         
         arrow_3d.add_updater(lambda mob, dt: rotate_spin_vector(mob, dt))
         # arrow_3d.add_updater(lambda mob, dt: shake_object(mob, dt))
-        sphere_mesh.add_updater(lambda mob, dt: shake_object(mob, dt))
+        # sphere_mesh.add_updater(lambda mob, dt: shake_object(mob, dt))
         
         vector_spin_rate.set_value(0.6)
         sphere_shake_amplitude.set_value(0.5)
