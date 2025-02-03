@@ -1,0 +1,8 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/waveform/1080p60/partial_movie_files/ExampleScene/1821166212_3266109756_646475866.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/waveform/1080p60/partial_movie_files/ExampleScene/585388311_2631580503_1328099957.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/waveform/1080p60/partial_movie_files/ExampleScene/585388311_726787252_150667319.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/waveform/1080p60/partial_movie_files/ExampleScene/585388311_2631580503_2478875043.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/waveform/1080p60/partial_movie_files/ExampleScene/585388311_789064381_816009161.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/waveform/1080p60/partial_movie_files/ExampleScene/585388311_3410655079_24397129.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/waveform/1080p60/partial_movie_files/ExampleScene/585388311_3515533520_3680442374.mp4'

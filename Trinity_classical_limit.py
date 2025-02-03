@@ -84,18 +84,33 @@ class ClassicalLimitAnimation(ThreeDScene):
         # wave_3d.set_style(fill_opacity=0.6, stroke_opacity=0.2).set_color(BLUE_E)
         
         # wave_line_3d = self.create_2d_wave_function(x_min=-4, x_max = 4).rotate(PI/2, axis=[0,1,0], about_point=ORIGIN).rotate(PI/2, axis=[1,0,0], about_point=ORIGIN)
+        # wave_line_3d = WaveFunc3d(
+        #     orientation=(75, 30, 0),
+        #     position=ORIGIN,
+        #     show_axes=False,
+        #     speed=2.0,
+        #     frequency=1.5,
+        #     turns=5,
+        #     r_max=0.5,
+        #     sigma=0.4,
+        #     x_span=1.5,
+        #     color=BLUE,
+        #     particle_color=RED,
+        # )
         wave_line_3d = WaveFunc3d(
             orientation=(75, 30, 0),
             position=ORIGIN,
             show_axes=False,
-            speed=2.0,
+            param_range=(-3,3),
             frequency=1.5,
-            turns=5,
-            r_max=0.5,
+            turns=3,
+            r_max=2,
             sigma=0.4,
             x_span=1.5,
-            color=BLUE,
-            particle_color=RED,
+            spiral_color=BLUE,
+            arrow_color=RED,
+            arrow_show=False,
+            arrow_endpoint="end",
         )
         wave_line_spin = Arrow3D(
             start=ORIGIN,

@@ -2,7 +2,7 @@ from manim import *
 import numpy as np
 import random
 import matplotlib as plt
-from test1 import * # magnetic_field.py
+from magnetic_field import * # magnetic_field.py
 
 
 # Camera Fix from https://gist.github.com/abul4fia/1419b181e8e3410ef78e6acc25c3df94#file-fixed_fixing-py-L13
@@ -67,8 +67,7 @@ class DipoleRotation(ThreeDScene):
         
         spin_direction = np.array([1,0,0])
         
-        spin_arrow = Arrow3D(start=ORIGIN, end=ORIGIN, color=RED)
-        Arrow3D(
+        spin_arrow = Arrow3D(
             start=ORIGIN,
             end=1.5*spin_direction,
             color=RED,
@@ -94,7 +93,7 @@ class DipoleRotation(ThreeDScene):
         self.play(FadeOut(particle_label))
         self.play(Write(axes), Write(x_label), Write(y_label), Write(z_label))
         self.wait(1)
-        self.play(Write(spin_arrow))
+        self.play(FadeIn(spin_arrow))
         
         curve_group = MyCurves(
             t_min=0,

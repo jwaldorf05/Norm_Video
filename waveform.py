@@ -2,232 +2,453 @@ from manim import *
 import numpy as np
 
 class WaveFunc3d(VGroup):
+    """
+    A class to create a 3D wave function visualized as a spiral curve.
+    Includes options for showing axes and adding a directional arrow.
+
+    Attributes:
+        orientation (tuple): The rotation (x, y, z) of the wave in degrees.
+        position (np.array): The position of the wave in the 3D space.
+        show_axes (bool): Whether to display axes.
+        param_range (tuple): The range of the parameter (min, max) for the spiral curve.
+        frequency (float): The frequency of the wave.
+        turns (int): The number of turns in the spiral.
+        r_max (float): The maximum radius of the spiral.
+        sigma (float): The Gaussian envelope parameter.
+        x_span (float): The x-axis span of the wave.
+        spiral_color (Color): The color of the spiral.
+        arrow_color (Color): The color of the arrow.
+        arrow_show (bool): Whether to show an arrow at the spiral's end/start.
+        arrow_endpoint (str): Determines if the arrow points to the "start" or "end" of the spiral.
+    """
+
     def __init__(
         self,
-        orientation=(0, 0, 0),
+        orientation=(0, 0, 0), 
         position=ORIGIN,
-        show_axes=True,
-        speed=1.0,
+        show_axes=False,
+        param_range=(-1, 1),
         frequency=1.0,
         turns=4,
         r_max=0.4,
         sigma=0.3,
         x_span=1.0,
-        formula=None,
-        color=BLUE,
-        particle_color=RED,
-        particle_opacity=1.0,
+        spiral_color=BLUE,
         arrow_color=YELLOW,
-        arrow_scale=0.3,
+        arrow_show=True,
+        arrow_endpoint="end",  
         **kwargs
     ):
-        """
-        A 3D wavefunction spiral with:
-
-         - A 'spiral' (ParametricFunction) from t=-1..+1
-         - A moving 'particle' (Sphere)
-         - An 'arrow' at the origin that follows e^{i theta} or some param in the XY-plane
-         - The entire group can be oriented & shifted, so it behaves like one object.
-
-        Parameters
-        ----------
-        orientation : (x_deg, y_deg, z_deg)
-            Euler angles in degrees for an initial rotation about (X, Y, Z).
-        position : np.ndarray
-            Shift the entire wavefunction in 3D.
-        show_axes : bool
-            Whether to show an internal ThreeDAxes.
-        speed : float
-            Affects the default spiral run_time (5.0 / speed).
-        frequency, turns, r_max, sigma, x_span, formula, etc.
-            Standard spiral parameters.
-        color : Color
-            Spiral color.
-        particle_color : Color
-            Moving sphere color.
-        particle_opacity : float
-            Opacity of the sphere (0 => invisible).
-        arrow_color : Color
-            The color of the small arrow.
-        arrow_scale : float
-            Scale factor for the arrow size.
-        """
         super().__init__(**kwargs)
 
-        # ------------------------------------------------------------
-        # 1) Store parameters
-        # ------------------------------------------------------------
+        # Initialize attributes
         self.orientation = orientation
         self.position = position
         self.show_axes = show_axes
-        self.speed = speed
+        self.param_range = param_range
         self.frequency = frequency
         self.turns = turns
         self.r_max = r_max
         self.sigma = sigma
         self.x_span = x_span
-        self.color = color
-        self.particle_color = particle_color
-        self.particle_opacity = particle_opacity
+        self.spiral_color = spiral_color
         self.arrow_color = arrow_color
-        self.arrow_scale = arrow_scale
+        self.arrow_show = arrow_show
+        self.arrow_endpoint = arrow_endpoint
 
-        # Default wave-packet if no formula is supplied
-        def default_wave_packet(t):
-            x_val = t * self.x_span
-            radius = self.r_max * np.exp(-(t**2) / (self.sigma**2))
-            angle = 2 * np.pi * self.turns * self.frequency * t
-            y_val = radius * np.cos(angle)
-            z_val = radius * np.sin(angle)
-            return np.array([x_val, y_val, z_val])
+        # Create the spiral function
+        self._spiral_func = self._make_spiral_func()
 
-        self.wave_packet_func = formula if formula else default_wave_packet
-
-        # ------------------------------------------------------------
-        # 2) Parametric Spiral + Particle
-        # ------------------------------------------------------------
-        self.t_tracker = ValueTracker(-1)
-
-        self.spiral = ParametricFunction(
-            self.wave_packet_func,
-            t_range=[-1, -1],  # collapsed initially
-            color=self.color,
-        )
-
-        self.particle = Sphere(radius=0.05, color=self.particle_color)
-        self.particle.set_opacity(self.particle_opacity)
-        self.particle.move_to(self.wave_packet_func(-1))
-
-        # Spiral updater
-        def spiral_updater(mob):
-            current_t = self.t_tracker.get_value()
-            new_spiral = ParametricFunction(
-                self.wave_packet_func,
-                t_range=[-1, current_t],
-                color=self.color
-            )
-            mob.become(new_spiral)
-
-        self.spiral.add_updater(spiral_updater)
-
-        # Particle updater
-        def particle_updater(mob):
-            current_t = self.t_tracker.get_value()
-            mob.move_to(self.wave_packet_func(current_t))
-
-        self.particle.add_updater(particle_updater)
-
-        # ------------------------------------------------------------
-        # 3) Optionally show internal 3D axes
-        # ------------------------------------------------------------
+        # Add optional axes
         if self.show_axes:
             self.axes = ThreeDAxes(
-                x_range=[-1, 1, 0.5],
-                y_range=[-1, 1, 0.5],
-                z_range=[-1, 1, 0.5],
-                x_length=4, y_length=4, z_length=4,
+                x_range=[-1, 1],
+                y_range=[-1, 1],
+                z_range=[-1, 1],
+                x_length=4,
+                y_length=4,
+                z_length=4,
             )
             self.add(self.axes)
 
-        # ------------------------------------------------------------
-        # 4) A small "flow arrow" at the origin that tracks e^{i theta}
-        # ------------------------------------------------------------
-        self.arrow_theta = ValueTracker(0)  # we'll animate or update this
-        # A simple 3D arrow from origin to (somewhere in x-y plane)
-        # We'll just make an Arrow3D from (0,0,0) to (arrow_scale, 0, 0) initially
-        self.flow_arrow = Arrow3D(
-            start=ORIGIN,
-            end=self.arrow_scale * RIGHT,
-            color=self.arrow_color,
-            thickness=0.01,
-        )
+        # Add the spiral
+        t_min, t_max = self.param_range
+        self.spiral = ParametricFunction(
+            self._spiral_func,
+            t_range=(t_min, t_max),
+            color=self.spiral_color
+        ).set_z_index(1)  # Ensure spiral appears behind other elements like arrows
+        self.add(self.spiral)
 
-        # Updater to revolve the arrow tip around the origin in the XY-plane
-        def arrow_updater(mob):
-            theta = self.arrow_theta.get_value()
-            # We place tip at arrow_scale * [cos(theta), sin(theta), 0]
-            new_tip = self.arrow_scale * np.array([np.cos(theta), np.sin(theta), 0])
-            mob.put_start_and_end_on(ORIGIN, new_tip)
+        # Add the directional arrow
+        if self.arrow_show:
+            start_pt = self._spiral_func(t_min)
+            end_pt = self._spiral_func(t_max)
+            arrow_target = end_pt if (self.arrow_endpoint.lower() == "end") else start_pt
 
-        self.flow_arrow.add_updater(arrow_updater)
+            self.arrow = Arrow3D(
+                start=ORIGIN,
+                end=arrow_target,
+                color=self.arrow_color,
+                thickness=0.02,
+            ).set_z_index(2)  # Ensure arrow is always on top
+            self.add(self.arrow)
+        else:
+            self.arrow = None
 
-        # Add spiral, particle, arrow
-        self.add(self.spiral, self.particle, self.flow_arrow)
-
-        # ------------------------------------------------------------
-        # 5) Shift + Rotate the entire group (so arrow, spiral, etc. move together)
-        # ------------------------------------------------------------
-        x_angle, y_angle, z_angle = self.orientation
-        self.rotate(x_angle * DEGREES, axis=RIGHT, about_point=ORIGIN)
-        self.rotate(y_angle * DEGREES, axis=UP, about_point=ORIGIN)
-        self.rotate(z_angle * DEGREES, axis=OUT, about_point=ORIGIN)
+        # Apply orientation and position adjustments
+        x_angle_deg, y_angle_deg, z_angle_deg = self.orientation
+        self.rotate(x_angle_deg * DEGREES, axis=RIGHT, about_point=ORIGIN)
+        self.rotate(y_angle_deg * DEGREES, axis=UP, about_point=ORIGIN)
+        self.rotate(z_angle_deg * DEGREES, axis=OUT, about_point=ORIGIN)
         self.shift(self.position)
 
-    # ----------------------------------------------------------------
-    # PUBLIC METHODS
-    # ----------------------------------------------------------------
+    def _make_spiral_func(self):
+        """
+        Creates the mathematical function representing the spiral.
 
-    def get_spiral_animation(self, run_time=None, rate_func=smooth):
+        Returns:
+            function: A parametric function of t that outputs (x, y, z) coordinates.
         """
-        Animates the drawing of the spiral from t=-1 to t=+1.
-        """
-        if run_time is None:
-            run_time = 5.0 / self.speed
-        return self.t_tracker.animate.set_value(1).set_run_time(run_time).set_rate_func(rate_func)
+        def spiral_func(t):
+            x_val = t * self.x_span
+            envelope = self.r_max * np.exp(-(t**2)/(self.sigma**2))  # Gaussian envelope
+            angle = 2 * np.pi * self.turns * self.frequency * t  # Angular frequency
+            y_val = envelope * np.cos(angle)
+            z_val = envelope * np.sin(angle)
+            return np.array([x_val, y_val, z_val])
+        return spiral_func
 
-    def get_arrow_animation(self, theta_end=TAU, run_time=2, rate_func=linear):
+    def animate_spiral_creation(self, run_time=3, rate_func=smooth):
         """
-        Animate the arrow's phase from 0 to theta_end (like e^{i theta}).
-        If you want to start from something other than 0, set self.arrow_theta.set_value(...) first.
-        """
-        return self.arrow_theta.animate.set_value(theta_end).set_run_time(run_time).set_rate_func(rate_func)
+        Animates the creation of the spiral curve.
 
-    def precess_spiral(self, axis=UP, rate=0.5, spin_center=ORIGIN):
+        Args:
+            run_time (float): Duration of the animation.
+            rate_func (function): The easing function for the animation.
+
+        Returns:
+            Animation: The animation object for creating the spiral.
         """
-        Continuously rotates the spiral about 'axis' at 'rate' revolutions per second, 
-        and also rotates the arrow with it, since they are all in one VGroup.
-        """
-        # This is a continuous rotation, done by an updater on the entire group 'self'.
-        self.add_updater(
-            lambda mob, dt: mob.rotate(dt * 2 * PI * rate, axis=axis, about_point=spin_center)
+        t_min, t_max = self.param_range
+        tracker = ValueTracker(t_min)
+        # if self.arrow_show:
+        #     self.remove(self.arrow)
+
+        # Remove existing spiral and add a collapsed version
+        self.remove(self.spiral)
+        collapsed_spiral = ParametricFunction(
+            self._spiral_func,
+            t_range=(t_min, t_min),
+            color=self.spiral_color
         )
+        self.spiral = collapsed_spiral
+        self.spiral.set_z_index(1)
+        self.add(self.spiral)
 
-    def stop_precession(self):
+        # Define updater to dynamically extend the spiral
+        def partial_draw_updater(mob):
+            current_t = tracker.get_value()
+            new_spiral = ParametricFunction(
+                self._spiral_func,
+                t_range=(t_min, current_t),
+                color=self.spiral_color
+            )
+            new_spiral.rotate(self.orientation[0] * DEGREES, axis=RIGHT, about_point=ORIGIN)
+            new_spiral.rotate(self.orientation[1] * DEGREES, axis=UP, about_point=ORIGIN)
+            new_spiral.rotate(self.orientation[2] * DEGREES, axis=OUT, about_point=ORIGIN)
+            new_spiral.shift(self.position)
+            mob.become(new_spiral.set_z_index(1))  # Keep spiral layered properly
+
+        self.spiral.add_updater(partial_draw_updater)
+
+        # Animate the tracker value to grow the spiral
+        if self.arrow_show:
+            anim = AnimationGroup(tracker.animate.set_value(t_max).set_run_time(run_time).set_rate_func(rate_func), Write(self.arrow))
+        else:
+            anim = tracker.animate.set_value(t_max).set_run_time(run_time).set_rate_func(rate_func)
+        # if self.arrow_show:
+        #     anim = AnimationGroup(anim, GrowArrow(self.arrow))
+        return anim
+
+    def reconfigure_wave(self, new_sigma=None, new_rmax=None):
         """
-        Removes the continuous rotation updater from the wavefunction group.
+        Reconfigures the wave by updating sigma and/or r_max.
+
+        Args:
+            new_sigma (float): The new sigma value for the Gaussian envelope.
+            new_rmax (float): The new maximum radius of the spiral.
         """
-        self.clear_updaters()
+        if new_sigma is not None:
+            self.sigma = new_sigma
+        if new_rmax is not None:
+            self.r_max = new_rmax
+
+        t_min, t_max = self.param_range
+
+        # Remove the current spiral and arrow
+        self.remove(self.spiral)
+        if self.arrow is not None:
+            self.remove(self.arrow)
+
+        # Create a new spiral with updated parameters
+        updated_func = self._make_spiral_func()
+        new_spiral = ParametricFunction(updated_func, t_range=(t_min, t_max), color=self.spiral_color)
+        self.spiral = new_spiral.move_to(self.position)
+        self.spiral.set_z_index(1)
+        self.add(self.spiral)
+
+        # Add a new arrow with updated endpoints
+        if self.arrow_show:
+            start_pt = updated_func(t_min)
+            end_pt = updated_func(t_max)
+            arrow_target = end_pt if (self.arrow_endpoint == "end") else start_pt
+            new_arrow = Arrow3D(ORIGIN, arrow_target, color=self.arrow_color, thickness=0.02)
+            self.arrow = new_arrow
+            self.arrow.set_z_index(2)  # Ensure arrow is layered above the spiral
+            self.add(self.arrow)
 
 
-class My3DScene(ThreeDScene):
+class ExampleScene(ThreeDScene):
+    """
+    Example scene demonstrating the WaveFunc3d class.
+    Includes animations and transformations.
+    """
     def construct(self):
-        wave = WaveFunc3d(
-            orientation=(0, 0, 0),
+        # Create a WaveFunc3d object
+        wave_obj = WaveFunc3d(
+            orientation=(45, 0, 0),
             position=ORIGIN,
             show_axes=True,
-            speed=1.5,
-            frequency=1.0,
-            turns=4,
+            param_range=(-1,1),
+            frequency=1.5,
+            turns=3,
             r_max=0.5,
-            sigma=0.3,
-            x_span=1.0,
-            color=BLUE,
-            particle_color=RED,
+            sigma=0.25,
+            x_span=1,
+            spiral_color=BLUE,
             arrow_color=YELLOW,
-            arrow_scale=0.5,
+            arrow_show=True,
+            arrow_endpoint="end",
         )
-        self.add(wave)
-        self.set_camera_orientation(phi=70*DEGREES, theta=30*DEGREES, distance=5)
+        self.add(wave_obj)
 
-        self.play(wave.get_spiral_animation(run_time=3))
+        # Set camera orientation
+        self.set_camera_orientation(phi=70*DEGREES, theta=30*DEGREES, distance=6)
 
-        self.play(wave.get_arrow_animation(theta_end=TAU, run_time=2))
-
+        # Animate the spiral creation
+        self.play(wave_obj.animate_spiral_creation(run_time=3))
         self.wait(1)
 
-        wave.precess_spiral(axis=OUT, rate=0.25)  # 0.25 rev/sec
-        self.wait(6)
-        wave.stop_precession()
+        # Optionally remove the updater after the animation
+        wave_obj.spiral.clear_updaters()
 
+        # Scale transformation
+        self.play(wave_obj.animate.scale(1.5))
+        self.wait(1)
+
+        # Adjust the wave by reconfiguring sigma
+        wave_obj.reconfigure_wave(new_sigma=0.2)
         self.wait(2)
 
+        # Rotate the group about the Z-axis
+        self.play(Rotate(wave_obj, angle=PI/2, axis=OUT), run_time=2)
+        self.wait()
+
+
+
+# from manim import *
+# import numpy as np
+
+# class WaveFunc3d(VGroup):
+#     def __init__(
+#         self,
+#         orientation=(0, 0, 0), 
+#         position=ORIGIN,
+#         show_axes=False,
+#         param_range=(-1, 1),
+#         frequency=1.0,
+#         turns=4,
+#         r_max=0.4,
+#         sigma=0.3,
+#         x_span=1.0,
+#         spiral_color=BLUE,
+#         arrow_color=YELLOW,
+#         arrow_show=True,
+#         arrow_endpoint="end",  
+#         **kwargs
+#     ):
+#         super().__init__(**kwargs)
+
+#         self.orientation = orientation
+#         self.position = position
+#         self.show_axes = show_axes
+#         self.param_range = param_range
+#         self.frequency = frequency
+#         self.turns = turns
+#         self.r_max = r_max
+#         self.sigma = sigma
+#         self.x_span = x_span
+#         self.spiral_color = spiral_color
+#         self.arrow_color = arrow_color
+#         self.arrow_show = arrow_show
+#         self.arrow_endpoint = arrow_endpoint
+
+#         self._spiral_func = self._make_spiral_func()
+
+#         if self.show_axes:
+#             self.axes = ThreeDAxes(
+#                 x_range=[-1, 1],
+#                 y_range=[-1, 1],
+#                 z_range=[-1, 1],
+#                 x_length=4,
+#                 y_length=4,
+#                 z_length=4,
+#             )
+#             self.add(self.axes)
+
+#         t_min, t_max = self.param_range
+#         self.spiral = ParametricFunction(
+#             self._spiral_func,
+#             t_range=(t_min, t_max),
+#             color=self.spiral_color
+#         ).set_z_index(1)
+#         self.add(self.spiral)
+
+#         if self.arrow_show:
+#             start_pt = self._spiral_func(t_min)
+#             end_pt = self._spiral_func(t_max)
+#             arrow_target = end_pt if (self.arrow_endpoint.lower() == "end") else start_pt
+
+#             self.arrow = Arrow3D(
+#                 start=ORIGIN,
+#                 end=arrow_target,
+#                 color=self.arrow_color,
+#                 thickness=0.02,
+#             ).set_z_index(2)
+#             self.add(self.arrow)
+#         else:
+#             self.arrow = None
+
+#         x_angle_deg, y_angle_deg, z_angle_deg = self.orientation
+#         self.rotate(x_angle_deg * DEGREES, axis=RIGHT, about_point=ORIGIN)
+#         self.rotate(y_angle_deg * DEGREES, axis=UP, about_point=ORIGIN)
+#         self.rotate(z_angle_deg * DEGREES, axis=OUT, about_point=ORIGIN)
+#         self.shift(self.position)
+
+#     def _make_spiral_func(self):
+#         def spiral_func(t):
+#             x_val = t * self.x_span
+#             envelope = self.r_max * np.exp(-(t**2)/(self.sigma**2))
+#             angle = 2 * np.pi * self.turns * self.frequency * t
+#             y_val = envelope * np.cos(angle)
+#             z_val = envelope * np.sin(angle)
+#             return np.array([x_val, y_val, z_val])
+#         return spiral_func
+
+
+#     def animate_spiral_creation(self, run_time=3, rate_func=smooth):
+        
+#         t_min, t_max = self.param_range
+
+#         tracker = ValueTracker(t_min)
+
+#         self.remove(self.spiral)
+
+#         collapsed_spiral = ParametricFunction(
+#             self._spiral_func,
+#             t_range=(t_min, t_min),
+#             color=self.spiral_color
+#         )
+#         self.spiral = collapsed_spiral
+#         self.spiral.set_z_index(1)
+#         self.add(self.spiral)
+
+#         def partial_draw_updater(mob):
+#             current_t = tracker.get_value()
+#             new_spiral = ParametricFunction(
+#                 self._spiral_func,
+#                 t_range=(t_min, current_t),
+#                 color=self.spiral_color
+#             )
+#             new_spiral.rotate(self.orientation[0] * DEGREES, axis=RIGHT, about_point=ORIGIN)
+#             new_spiral.rotate(self.orientation[1] * DEGREES, axis=UP, about_point=ORIGIN)
+#             new_spiral.rotate(self.orientation[2] * DEGREES, axis=OUT, about_point=ORIGIN)
+#             new_spiral.shift(self.position)
+#             mob.become(new_spiral.set_z_index(1))
+
+#         self.spiral.add_updater(partial_draw_updater)
+
+#         anim = tracker.animate.set_value(t_max).set_run_time(run_time).set_rate_func(rate_func)
+
+#         return anim
+
+#     def reconfigure_wave(self, new_sigma=None, new_rmax=None):
+    
+#         if new_sigma is not None:
+#             self.sigma = new_sigma
+#         if new_rmax is not None:
+#             self.r_max = new_rmax
+
+#         t_min, t_max = self.param_range
+
+#         self.remove(self.spiral)
+#         if self.arrow is not None:
+#             self.remove(self.arrow)
+
+#         updated_func = self._make_spiral_func()
+#         new_spiral = ParametricFunction(updated_func, t_range=(t_min, t_max), color=self.spiral_color)
+#         self.spiral = new_spiral.move_to(self.position)
+#         self.spiral.set_z_index(1)
+#         self.add(self.spiral)
+
+#         if self.arrow_show:
+#             start_pt = updated_func(t_min)
+#             end_pt = updated_func(t_max)
+#             arrow_target = end_pt if (self.arrow_endpoint == "end") else start_pt
+#             new_arrow = Arrow3D(ORIGIN, arrow_target, color=self.arrow_color, thickness=0.02)
+#             self.arrow = new_arrow
+#             self.arrow.set_z_index(2)
+#             self.add(self.arrow)
+
+
+
+# class ExampleScene(ThreeDScene):
+#     def construct(self):
+#         wave_obj = WaveFunc3d(
+#             orientation=(45, 0, 0),
+#             position=ORIGIN,
+#             show_axes=True,
+#             param_range=(-1,1),
+#             frequency=1.5,
+#             turns=3,
+#             r_max=0.5,
+#             sigma=0.25,
+#             x_span=1,
+#             spiral_color=BLUE,
+#             arrow_color=YELLOW,
+#             arrow_show=True,
+#             arrow_endpoint="end",
+#         )
+#         self.add(wave_obj)
+
+#         self.set_camera_orientation(phi=70*DEGREES, theta=30*DEGREES, distance=6)
+
+#         # Animate the spiral 'creation'
+#         self.play(wave_obj.animate_spiral_creation(run_time=3))
+#         self.wait(1)
+        
+#         # Optionally remove the updater after creation is done:
+#         wave_obj.spiral.clear_updaters()
+
+#         # Try a transform
+#         self.play(wave_obj.animate.scale(1.5))
+#         self.wait(1)
+
+#         # Re-squish the wave by adjusting sigma:
+#         wave_obj.reconfigure_wave(new_sigma=0.2)
+#         self.wait(2)
+
+#         # Rotate the entire group about Z:
+#         self.play(Rotate(wave_obj, angle=PI/2, axis=OUT), run_time=2)
+#         self.wait()

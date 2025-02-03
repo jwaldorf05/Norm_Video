@@ -1,0 +1,8 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/test1/1080p60/partial_movie_files/ExampleScene/1821166212_3266109756_3235498406.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/test1/1080p60/partial_movie_files/ExampleScene/585388311_2631580503_1484267441.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/test1/1080p60/partial_movie_files/ExampleScene/585388311_1428846026_978000351.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/test1/1080p60/partial_movie_files/ExampleScene/585388311_2631580503_2133606608.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/test1/1080p60/partial_movie_files/ExampleScene/585388311_789064381_2669890808.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/test1/1080p60/partial_movie_files/ExampleScene/585388311_1713469029_3102648414.mp4'
+file 'file:/Users/jonathan/Desktop/Norm_Video/media/videos/test1/1080p60/partial_movie_files/ExampleScene/585388311_3515533520_754385581.mp4'
